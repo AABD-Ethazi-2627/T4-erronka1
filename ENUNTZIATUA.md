@@ -7,8 +7,6 @@
 
 ## Testuingurua eta Erronka
 
-![Sistema Osoa](./irudiak/SistemaOsoa.png)
-
 **ARAKAIN Makineriak** 50 CNC makina ditu Bilboko fabrika batean. Makina bakoitza gelditzen
 denean, produkzioa eteten da — eta kostua **1.200 €/orduko** da.
 
@@ -84,68 +82,18 @@ jasotzen ditu CSV fitxategiak `/mnt/cnc-stream/` karpetan.
 
 ## Arkitektura: Zure Lan-Mapa
 
-![Ikaslearen lan-mapa](./irudiak/Ikasleak.png)
-
 ---
 
 ## 1. Fasea — Sentsore-Datuak Hartu eta Gorde
-
-**Iraupena:** ~1 aste | **Modulua:** 5074 nagusiki | **Pisua:** %35
 
 ### Helburua
 
 Makinetako sentsore-datuak denbora errealean bildu, Elasticsearch-en biltegiratu, eta
 Kibana-n bistaratu, fabrikako makineria-egoeraren ikuspegi osoa edukitzeko.
 
-### Zer gertatu behar da teknikoki
-
-```
-Simuladorea (irakaslea)
-      ↓ CSV batch bat 30 segundoro
-/mnt/cnc-stream/cnc_batch_*.csv
-      ↓
-Filebeat ← ZURE LANA HASTEN DA HEMEN (1)
-      ↓ produzitu Kafka Topic-ra (lerro gordina)
-Apache Kafka (Topic: cnc-sensors-raw)
-      ↓ kontsumitu
-Apache NiFi ← ZURE LANA (2)
-      ↓ CSV → JSON bihurtu
-Elasticsearch (cnc-sensors indizea)
-      ↓
-Kibana (dashboarda)
-```
-
-> **Zergatik Kafka tartean?** Kafka **bufferra eta desakoplaketa** eskaintzen ditu:
-> - NiFi geldituz gero, datuak ez dira galtzen (Kafka-n geratzen dira)
-> - Hainbat kontsumitzaile Topic bera erabil dezakete paraleloan
-> - Filebeat eta NiFi-ren erritmoak independenteak dira
-
 ### Zure Zeregina 1: Filebeat Konfiguratu
 
 `filebeat/filebeat.yml` fitxategia eskeletoa da — zuk osatu behar duzu.
-
-Filebeat-ek lau gauza jakin behar ditu:
-- **Zer begiratu:** zein karpetako zein fitxategiak
-- **Zer ez bidali:** CSV goiburu-lerroak ez dira datu, ez bidali Kafka-ra
-- **Nora bidali:** Kafka broker-aren helbidea eta Topic-izena
-- **Nola formateatu:** lerro gordina bidali (`codec.format`), ez Beats event JSON osoa
-
-```yaml
-# filebeat/filebeat.yml — osatu beharreko zatiak:
-
-filebeat.inputs:
-  - type: ???          # "filestream" gomendatzen da
-    paths:
-      - ???            # /mnt/cnc-stream/*.csv — baina Docker barruan zer bide da?
-    exclude_lines: ??? # CSV goiburua nola identifikatu? Zer du berezia?
-
-output.???:            # Kafka output mota
-  hosts:
-    - ???              # Kafka broker-aren helbidea (Docker sare barnean)
-  topic: ???           # Kafka Topic-izena (adib. cnc-sensors-raw)
-  codec.format:
-    string: ???        # Pista: '%{[message]}' — lerro gordina bidaltzen du
-```
 
 > **Pista:** Docker Compose-en zerbitzu-izenak hostname gisa funtzionatzen dute sare
 > barnean. `docker-compose.yml`-eko zerbitzu-izenak begiratu.
@@ -164,34 +112,8 @@ NiFi-k Kafka Topicetik lerro bakoitza FlowFile bat gisa jasotzen du. Lerro baten
 2026-04-29T10:57:50Z,CNC-039,L,299.0,308.6,1587,38.6,124,0,0,0,0,0,0
 ```
 
-NiFi flow bat osatu behar duzu honako urratsak egiteko:
+NiFi flow bat osatu behar duzu.
 
-1. **`ConsumeKafka_2_6`** prozesadorea (dagoeneko dago, `cnc-sensors-raw` Topica kontsumitzen du)
-2. **CSV → JSON bihurtu** — zutabe bakoitzari izena eman (CSV-k ez du goibururik — schema-text esplizitua erabili)
-3. **`PutElasticsearchJson`** — `cnc-sensors` indizera bidali (ElasticSearchClientService bidez)
-
-> **Garrantzitsua:** Filebeat-ek goiburua iragazten du, beraz NiFi-ra lerro garbiak iristen dira goiburu gabe. CSVReader-en **schema-text** propietatean Avro schema osoa zehaztu behar duzu (14 eremu: timestamp, machine_id, machine_type, air_temp_K, ...).
-
-**Elasticsearch indize-egitura:**
-
-```json
-PUT /cnc-sensors
-{
-  "mappings": {
-    "properties": {
-      "timestamp":       { "type": "date" },
-      "machine_id":      { "type": "keyword" },
-      "machine_type":    { "type": "keyword" },
-      "air_temp_K":      { "type": "float" },
-      "process_temp_K":  { "type": "float" },
-      "rpm":             { "type": "integer" },
-      "torque_Nm":       { "type": "float" },
-      "tool_wear_min":   { "type": "integer" },
-      "machine_failure": { "type": "boolean" }
-    }
-  }
-}
-```
 
 ### Kibana Dashboarda
 
