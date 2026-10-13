@@ -316,15 +316,7 @@ Alert mailak: `OK` (< %50) · `KONTUZ` (%50–80) · `LARRIA` (> %80)
 
 ### Zure Zeregina NiFi-n (3. fasea)
 
-NiFi flow berri bat sortu (edo lehena hedatu):
-
-1. **`ConsumeKafka_2_6`** — berdina, Kafka Topic-tik datuak jaso (`group.id` desberdina erabili!)
-2. **CSV → JSON bihurtu** — berdina 1. faseko prozesadoreak erabiliz
-3. **`InvokeHTTP`** — `POST http://scoring-api:8000/predict`ra bidali
-4. **`RouteOnAttribute`** — `alert_level` atributuaren arabera bideratu:
-   - `LARRIA` edo `KONTUZ` → `cnc-alerts` indizera
-   - `OK` → `cnc-normal` indizera
-5. **`PutElasticsearchJson`** — bi indizeetara bidali (ElasticSearchClientService bera erabili)
+NiFi flow berri bat sortu (edo lehena hedatu).
 
 ### Kibana Alerta-Dashboarda
 
