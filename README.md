@@ -40,20 +40,6 @@ cnc-guard/
     └── ai4i2020_train.csv    ← entrenamendurako datuak
 ```
 
-## Datu-fluxua
-
-```
-Simuladorea → /mnt/cnc-stream/*.csv
-              ↓
-           Filebeat (osatu behar duzu)
-              ↓ produzitu Kafka topiko cnc-sensors-raw
-           Kafka (buffer + desakoplaketa)
-              ↓ kontsumitu
-           NiFi (osatu behar duzu)
-              ↓
-           Elasticsearch → Kibana
-```
-
 ## 4. Erronkaren dokumentua
 
 `ENUNTZIATUA.md` irakurri — hiru faseetan zer egin azaltzen du.
