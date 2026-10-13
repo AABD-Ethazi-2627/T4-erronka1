@@ -5,86 +5,14 @@
 services:
 
   # ── Kafka — Mezularitza bufferra (KRaft mode, zookeeper gabe) ────────────────
-  kafka:
-    image: apache/kafka:3.7.0
-    container_name: cnc-kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_NODE_ID: "1"
-      KAFKA_PROCESS_ROLES: "broker,controller"
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
-      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
-      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
-      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
-    restart: unless-stopped
 
   # ── Filebeat — CSV fitxategien irakurlea ─────────────────────────────────────
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:8.13.0
-    container_name: cnc-filebeat
-    user: root                          # NFS karpeta irakurtzeko beharrezkoa
-    volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      # ITURRIA (Simuladorearen CSV fitxategiak):
-      # - Linux VM-etan (NFS):
-      - /mnt/cnc-stream:/cnc-stream:ro
-      # - Windows ekipoetan (Samba/SMB erabiliz gero):
-      #   Aukera A (Z: diskoa mapatuta): - Z:\:/cnc-stream:ro
-      #   Aukera B (CIFS Docker bolumena): ikus fitxategi amaierako adibidea
-      - filebeat-data:/usr/share/filebeat/data  # Registry iraunkorra
-    command: filebeat -e --strict.perms=false
-    depends_on:
-      - kafka
-    restart: unless-stopped
 
   # ── Apache NiFi — Transformazioa eta bideratzea ──────────────────────────────
-  nifi:
-    image: apache/nifi:1.25.0
-    container_name: cnc-nifi
-    ports:
-      - "8443:8443"   # Web UI
-    volumes:
-      - ./nifi-flows:/opt/nifi/nifi-current/conf/flows
-    environment:
-      SINGLE_USER_CREDENTIALS_USERNAME: admin
-      SINGLE_USER_CREDENTIALS_PASSWORD: adminpassword123
-    depends_on:
-      - kafka
-    restart: unless-stopped
 
   # ── Elasticsearch — Biltegiratze eta bilaketa ────────────────────────────────
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
-    container_name: cnc-elasticsearch
-    ports:
-      - "9200:9200"
-    environment:
-      discovery.type: single-node
-      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
-      xpack.security.enabled: "false"
-    volumes:
-      - es-data:/usr/share/elasticsearch/data
-    restart: unless-stopped
 
   # ── Kibana — Bistaratzea ─────────────────────────────────────────────────────
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.0
-    container_name: cnc-kibana
-    ports:
-      - "5601:5601"
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-    restart: unless-stopped
 
   # ── Scoring API — ML inferentzia (3. fasea) ──────────────────────────────────
   scoring-api:
