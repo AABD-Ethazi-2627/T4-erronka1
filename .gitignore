@@ -1,0 +1,30 @@
+
+@'
+# Secrets i ingurune-aldagaiak
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# IDEak eta editoreak
+.vscode/
+.idea/
+
+# Logak eta aldi baterako fitxategiak
+*.log
+*.tmp
+*.bak
+
+# Sistema eragilea
+.DS_Store
+Thumbs.db
+desktop.ini
+'@ | Set-Content -Encoding utf8 .gitignore
