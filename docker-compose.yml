@@ -125,4 +125,4 @@ volumes:
     driver_opts:
       type: cifs
       device: "//192.168.75.150/cnc-stream"
-      o: "addr=192.168.75.150,username=${SMB_USERNAME},password=${SMB_PASSWORD},vers=3.0,ro"
+      o: "addr=192.168.75.150,username=${SMB_USERNAME},password=${SMB_PASSWORD},vers=3.0,ro,actimeo=0,cache=none,nohandlecache"
