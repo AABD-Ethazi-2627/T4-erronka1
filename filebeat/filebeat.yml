@@ -3,32 +3,27 @@
 # IKASLEEK OSATU BEHAR DUTE
 # ═══════════════════════════════════════════════════════════════════
 
-# 1. SARRERA: Zer fitxategi begiratu behar ditu Filebeat-ek?
+
+
 filebeat.inputs:
-  - type: # ← Zein input mota? (filestream gomendatzen da)
+  - type: filestream
     id: cnc-stream
     paths:
-      - # ← Zein karpetako zein fitxategiak? (adib. /karpeta/*.csv)
+      - /datos-csv/*.csv
 
-    # CSV fitxategiek goiburu-lerro bat dute (zutabe-izenak).
-    # Lerro hori ez bidali Kafka-ra — nola iragazi?
-    exclude_lines: # ← Bete: zer eredu dute goiburu-lerroek?
+    # Ignorar la cabecera del CSV
+    exclude_lines: ['^timestamp,']
 
-    # NFS-ekin lan egiten ari garenez, fitxategi-jarraipena
-    # path bidez egin behar da (inodo-aldaketak ekiditeko)
+    # Identificar los archivos por su ruta
     file_identity:
       path: ~
 
-# 2. IRTEERA: Nora bidali datuak?
-# Kafka topiko batera bidaltzen ditugu — NiFi-k handik kontsumituko ditu.
-# Lerro gordina bidali, ez Beats event JSON osoa (codec.format erabili).
-output.# ← Zein output mota erabili behar da Kafka-rentzat?
-  hosts:
-    - # ← Kafka broker-aren helbidea eta ataka (Docker sare barnean)
-  topic: # ← Kafka topiko-izena (adib. cnc-sensors-raw)
+output.kafka:
+  hosts: ["kafka:9092"]
+  topic: "cnc-sensors-raw"
   codec.format:
-    string: # ← Nola formateatu mezua? Pista: '%{[message]}' (lerro gordina)
+    string: '%{[message]}'
 
-# 3. ERREGISTROA
 logging.level: info
 logging.to_files: false
+
