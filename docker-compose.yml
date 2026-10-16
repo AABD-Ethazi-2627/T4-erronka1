@@ -40,7 +40,7 @@ services:
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       # .env-ko CSV_DIR-k VM-an muntatutako karpetara apuntatu behar du.
-      - ${CSV_DIR:-./cnc-stream}:/datos-csv:ro
+      - cnc-csv-share:/datos-csv:ro
       - filebeat-data:/usr/share/filebeat/data
     networks: [cnc-net]
 
@@ -120,3 +120,9 @@ volumes:
   nifi-content:
   nifi-provenance:
   es-data:
+  cnc-csv-share:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: "//192.168.75.150/cnc-stream"
+      o: "addr=192.168.75.150,username=${SMB_USERNAME},password=${SMB_PASSWORD},vers=3.0,ro"
