@@ -54,7 +54,9 @@ class SensorReading(BaseModel):
 
 
 class Prediction(BaseModel):
+    timestamp: datetime
     machine_id: str
+    machine_type: Literal["H", "M", "L"]
     failure_predicted: bool
     failure_probability: float = Field(ge=0, le=1)
     alert_level: Literal["OK", "KONTUZ", "LARRIA"]
@@ -223,7 +225,9 @@ def predict(payload: SensorReading, request: Request):
         raise HTTPException(status_code=500, detail="Model prediction failed") from exc
 
     return Prediction(
+        timestamp=payload.timestamp,
         machine_id=payload.machine_id,
+        machine_type=payload.machine_type,
         failure_predicted=failure_predicted,
         failure_probability=round(failure_probability, 4),
         alert_level=_alert_level(failure_probability, anomaly_detected),
