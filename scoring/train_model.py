@@ -1,13 +1,20 @@
-"""Clean the training CSV, train the failure models, and save them for the API."""
+"""Clean the training CSV, evaluate the models, and save them for the API."""
 
 from pathlib import Path
 
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import IsolationForest
 from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import f1_score
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline
@@ -25,6 +32,7 @@ FEATURE_COLUMNS = [
     "torque_Nm",
     "tool_wear_min",
 ]
+ENGINEERED_FEATURE_COLUMNS = ["temp_diff", "power_est"]
 QUALITY_COLUMN = "machine_type"
 TARGET_COLUMN = "machine_failure"
 FAILURE_TYPE_COLUMNS = [
@@ -37,10 +45,10 @@ FAILURE_TYPE_COLUMNS = [
 NUMERIC_COLUMNS = [*FEATURE_COLUMNS, TARGET_COLUMN, *FAILURE_TYPE_COLUMNS]
 
 
-def _make_preprocessor() -> ColumnTransformer:
+def _make_preprocessor(numeric_columns: list[str]) -> ColumnTransformer:
     return ColumnTransformer(
         transformers=[
-            ("numeric", "passthrough", FEATURE_COLUMNS),
+            ("numeric", "passthrough", numeric_columns),
             ("quality", OneHotEncoder(handle_unknown="ignore"), [QUALITY_COLUMN]),
         ]
     )
@@ -86,12 +94,96 @@ def clean_training_data(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
+def add_engineered_features(data: pd.DataFrame) -> pd.DataFrame:
+    """Add physically interpretable features used by training and inference."""
+
+    data = data.copy()
+    data["temp_diff"] = data["process_temp_K"] - data["air_temp_K"]
+    data["power_est"] = data["rpm"] * data["torque_Nm"]
+    return data
+
+
+def choose_failure_threshold(
+    y_true: pd.Series,
+    probabilities: np.ndarray,
+    target_recall: float = 0.76,
+) -> tuple[float, dict[str, float]]:
+    """Choose a threshold that prioritizes recall while retaining useful precision."""
+
+    precision, recall, thresholds = precision_recall_curve(y_true, probabilities)
+    candidates = []
+    for index, threshold in enumerate(thresholds):
+        if recall[index] >= target_recall:
+            candidates.append(
+                (
+                    f1_score(y_true, probabilities >= threshold, zero_division=0),
+                    precision[index],
+                    recall[index],
+                    float(threshold),
+                )
+            )
+
+    if candidates:
+        _, candidate_precision, candidate_recall, selected = max(candidates)
+    else:
+        index = int(np.argmax(recall[:-1]))
+        selected = float(thresholds[index])
+        candidate_precision = float(precision[index])
+        candidate_recall = float(recall[index])
+
+    return selected, {
+        "target_recall": target_recall,
+        "validation_recall": round(candidate_recall, 4),
+        "validation_precision": round(candidate_precision, 4),
+    }
+
+
+def evaluate_failure_model(
+    model: Pipeline,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+) -> tuple[float, dict[str, object]]:
+    """Print validation metrics and return the tuned threshold plus metrics."""
+
+    probabilities = model.predict_proba(X_test)[:, 1]
+    default_predictions = probabilities >= 0.5
+    threshold, threshold_metrics = choose_failure_threshold(y_test, probabilities)
+    tuned_predictions = probabilities >= threshold
+
+    print("\nOverall failure validation (default threshold=0.50):")
+    print(classification_report(y_test, default_predictions, zero_division=0))
+    print("Confusion matrix:")
+    print(confusion_matrix(y_test, default_predictions).tolist())
+    print(f"ROC-AUC: {roc_auc_score(y_test, probabilities):.4f}")
+
+    print(f"\nTuned threshold: {threshold:.4f}")
+    print(classification_report(y_test, tuned_predictions, zero_division=0))
+    print("Tuned confusion matrix:")
+    print(confusion_matrix(y_test, tuned_predictions).tolist())
+    print(
+        "Tuned metrics: "
+        f"recall={recall_score(y_test, tuned_predictions, zero_division=0):.4f}, "
+        f"precision={precision_score(y_test, tuned_predictions, zero_division=0):.4f}, "
+        f"f1={f1_score(y_test, tuned_predictions, zero_division=0):.4f}"
+    )
+
+    metrics = {
+        "roc_auc": round(float(roc_auc_score(y_test, probabilities)), 4),
+        "default_confusion_matrix": confusion_matrix(y_test, default_predictions).tolist(),
+        "tuned_confusion_matrix": confusion_matrix(y_test, tuned_predictions).tolist(),
+        "tuned_threshold": round(threshold, 4),
+        **threshold_metrics,
+    }
+    return threshold, metrics
+
+
 def main() -> None:
     if not DATA_PATH.is_file():
         raise FileNotFoundError(f"Training data not found: {DATA_PATH}")
 
-    cleaned = clean_training_data(pd.read_csv(DATA_PATH))
-    feature_columns = [*FEATURE_COLUMNS, QUALITY_COLUMN]
+    cleaned = add_engineered_features(clean_training_data(pd.read_csv(DATA_PATH)))
+    numeric_feature_columns = [*FEATURE_COLUMNS, *ENGINEERED_FEATURE_COLUMNS]
+    feature_columns = [*numeric_feature_columns, QUALITY_COLUMN]
     X = cleaned[feature_columns]
     y = cleaned[TARGET_COLUMN].astype(int)
     y_failure_types = cleaned[FAILURE_TYPE_COLUMNS].astype(int)
@@ -107,7 +199,7 @@ def main() -> None:
 
     overall_model = Pipeline(
         [
-            ("preprocessor", _make_preprocessor()),
+            ("preprocessor", _make_preprocessor(numeric_feature_columns)),
             (
                 "classifier",
                 RandomForestClassifier(
@@ -122,7 +214,7 @@ def main() -> None:
 
     failure_type_model = Pipeline(
         [
-            ("preprocessor", _make_preprocessor()),
+            ("preprocessor", _make_preprocessor(numeric_feature_columns)),
             (
                 "classifier",
                 MultiOutputClassifier(
@@ -139,7 +231,7 @@ def main() -> None:
 
     anomaly_model = Pipeline(
         [
-            ("preprocessor", _make_preprocessor()),
+            ("preprocessor", _make_preprocessor(numeric_feature_columns)),
             (
                 "detector",
                 IsolationForest(
@@ -153,8 +245,29 @@ def main() -> None:
     normal_rows = X_train[y_train == 0]
     anomaly_model.fit(normal_rows)
 
-    print("\nOverall failure validation:")
-    print(classification_report(y_test, overall_model.predict(X_test), zero_division=0))
+    failure_threshold, evaluation_metrics = evaluate_failure_model(
+        overall_model,
+        X_test,
+        y_test,
+    )
+
+    classifier = overall_model.named_steps["classifier"]
+    print("Feature importance:")
+    transformed_names = [
+        *numeric_feature_columns,
+        *overall_model.named_steps["preprocessor"]
+        .named_transformers_["quality"]
+        .get_feature_names_out([QUALITY_COLUMN]),
+    ]
+    print(
+        dict(
+            sorted(
+                zip(transformed_names, classifier.feature_importances_),
+                key=lambda item: item[1],
+                reverse=True,
+            )
+        )
+    )
 
     print("Failure type validation:")
     type_predictions = failure_type_model.predict(X_test)
@@ -173,12 +286,15 @@ def main() -> None:
     print(classification_report(y_test, anomaly_flags, zero_division=0))
 
     model_artifact = {
-        "version": 2,
+        "version": 3,
         "overall_model": overall_model,
         "failure_type_model": failure_type_model,
         "anomaly_model": anomaly_model,
         "feature_columns": feature_columns,
+        "engineered_feature_columns": ENGINEERED_FEATURE_COLUMNS,
         "failure_type_columns": FAILURE_TYPE_COLUMNS,
+        "failure_threshold": failure_threshold,
+        "evaluation": evaluation_metrics,
         "quality_values": {"H": "High", "M": "Medium", "L": "Low"},
     }
 

@@ -22,6 +22,7 @@ FEATURE_COLUMNS = [
     "torque_Nm",
     "tool_wear_min",
 ]
+ENGINEERED_FEATURE_COLUMNS = ["temp_diff", "power_est"]
 FAILURE_TYPE_COLUMNS = [
     "failure_TWF",
     "failure_HDF",
@@ -169,9 +170,10 @@ def _anomaly_prediction(
 def _alert_level(
     probability: float,
     anomaly_detected: bool,
+    failure_predicted: bool,
 ) -> Literal["OK", "KONTUZ", "LARRIA"]:
     if probability < 0.5:
-        if anomaly_detected:
+        if anomaly_detected or failure_predicted:
             return "KONTUZ"
         return "OK"
     if probability < 0.8:
@@ -192,14 +194,19 @@ def predict(payload: SensorReading, request: Request):
         overall_model = model.get("overall_model")
         failure_type_model = model.get("failure_type_model")
         anomaly_model = model.get("anomaly_model")
-        feature_columns = model.get("feature_columns", [*FEATURE_COLUMNS, "machine_type"])
+        feature_columns = model.get(
+            "feature_columns",
+            [*FEATURE_COLUMNS, *ENGINEERED_FEATURE_COLUMNS, "machine_type"],
+        )
         failure_type_columns = model.get("failure_type_columns", FAILURE_TYPE_COLUMNS)
+        failure_threshold = float(model.get("failure_threshold", 0.5))
     else:
         overall_model = model
         failure_type_model = None
         anomaly_model = None
         feature_columns = FEATURE_COLUMNS
         failure_type_columns = []
+        failure_threshold = 0.5
 
     values = {
         "air_temp_K": payload.air_temp_K,
@@ -207,13 +214,15 @@ def predict(payload: SensorReading, request: Request):
         "rpm": payload.rpm,
         "torque_Nm": payload.torque_Nm,
         "tool_wear_min": payload.tool_wear_min,
+        "temp_diff": payload.process_temp_K - payload.air_temp_K,
+        "power_est": payload.rpm * payload.torque_Nm,
         "machine_type": payload.machine_type,
     }
     features = pd.DataFrame([{column: values[column] for column in feature_columns}])
 
     try:
         failure_probability = _failure_probability(overall_model, features)
-        failure_predicted = bool(overall_model.predict(features)[0])
+        failure_predicted = failure_probability >= failure_threshold
         failure_types, failure_type_probabilities = _failure_type_predictions(
             failure_type_model,
             features,
@@ -230,7 +239,11 @@ def predict(payload: SensorReading, request: Request):
         machine_type=payload.machine_type,
         failure_predicted=failure_predicted,
         failure_probability=round(failure_probability, 4),
-        alert_level=_alert_level(failure_probability, anomaly_detected),
+        alert_level=_alert_level(
+            failure_probability,
+            anomaly_detected,
+            failure_predicted,
+        ),
         failure_types=failure_types,
         failure_type_probabilities=failure_type_probabilities,
         anomaly_detected=anomaly_detected,
