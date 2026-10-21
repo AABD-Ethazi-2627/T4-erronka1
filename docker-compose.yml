@@ -106,12 +106,27 @@ services:
       MODEL_PATH: /models/cnc_failure_model.pkl
     networks: [cnc-net]
 
+  # MongoDB — NiFi erroreen biltegiratzea
+  mongodb:
+    image: mongo:7
+    container_name: cnc-mongodb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_USERNAME:-mongoadmin}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD:?Set MONGO_PASSWORD in .env}"
+    volumes:
+      - mongo-data:/data/db
+    networks: [cnc-net]
+
 networks:
   cnc-net:
     driver: bridge
 
 volumes:
   kafka-data:
+  mongo-data:
   filebeat-data:
   nifi-conf:
   nifi-state:
