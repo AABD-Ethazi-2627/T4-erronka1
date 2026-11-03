@@ -1,0 +1,11 @@
+﻿Aldagaia,Garrantzia
+numeric__rpm,0.21058978498724004
+numeric__torque_Nm,0.20270995581316964
+numeric__tool_wear_min,0.2025896604822526
+numeric__power_est,0.201054396714222
+numeric__temp_diff,0.08448825895061463
+numeric__air_temp_K,0.04812032195257979
+numeric__process_temp_K,0.03696734307341909
+quality__machine_type_L,0.005869888197545057
+quality__machine_type_M,0.003908244837436891
+quality__machine_type_H,0.0037021449915201924

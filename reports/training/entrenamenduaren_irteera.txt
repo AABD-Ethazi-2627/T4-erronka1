@@ -1,0 +1,135 @@
+Kargatutako errenkadak: 8000
+Kendutako bikoiztuak: 0
+Beharrezko balio faltadun errenkada kenduak: 0
+Entrenamendu-prozesurako errenkadak: 8000
+Makinaren kalitatearen banaketa: {'L': 4830, 'M': 2381, 'H': 789}
+Helburuaren banaketa: {0: 7729, 1: 271}
+Hutsegite-moten banaketa:
+{'failure_TWF': 36, 'failure_HDF': 86, 'failure_PWF': 82, 'failure_OSF': 82, 'failure_RNF': 15}
+
+Hutsegite orokorra: balidazioa (atalase lehenetsia=0.50):
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      0.99      1546
+           1       0.95      0.70      0.81        54
+
+    accuracy                           0.99      1600
+   macro avg       0.97      0.85      0.90      1600
+weighted avg       0.99      0.99      0.99      1600
+
+Nahasmen-matrizea:
+[[1544, 2], [16, 38]]
+ROC-AUC: 0.9651
+
+Kostuen arabera doitutako atalasea: 0.1600
+              precision    recall  f1-score   support
+
+           0       1.00      0.97      0.98      1546
+           1       0.54      0.91      0.68        54
+
+    accuracy                           0.97      1600
+   macro avg       0.77      0.94      0.83      1600
+weighted avg       0.98      0.97      0.97      1600
+
+Kostuen arabera doitutako nahasmen-matrizea:
+[[1504, 42], [5, 49]]
+Kostuen araberako metrikak: recall=0.9074, precision=0.5385, f1=0.6759, cost=48100.00 EUR
+
+Hutsegite orokorra: test independentea (atalase lehenetsia=0.50):
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      0.99      1546
+           1       0.89      0.78      0.83        54
+
+    accuracy                           0.99      1600
+   macro avg       0.94      0.89      0.91      1600
+weighted avg       0.99      0.99      0.99      1600
+
+Nahasmen-matrizea:
+[[1541, 5], [12, 42]]
+ROC-AUC: 0.9647
+
+Kostuen arabera doitutako atalasea: 0.1600
+              precision    recall  f1-score   support
+
+           0       0.99      0.96      0.98      1546
+           1       0.42      0.83      0.56        54
+
+    accuracy                           0.96      1600
+   macro avg       0.71      0.90      0.77      1600
+weighted avg       0.97      0.96      0.96      1600
+
+Kostuen arabera doitutako nahasmen-matrizea:
+[[1485, 61], [9, 45]]
+Kostuen araberako metrikak: recall=0.8333, precision=0.4245, f1=0.5625, cost=70700.00 EUR
+Aldagaien garrantzia:
+{'rpm': np.float64(0.21058978498724004), 'torque_Nm': np.float64(0.20270995581316964), 'tool_wear_min': np.float64(0.2025896604822526), 'power_est': np.float64(0.201054396714222), 'temp_diff': np.float64(0.08448825895061463), 'air_temp_K': np.float64(0.04812032195257979), 'process_temp_K': np.float64(0.03696734307341909), 'machine_type_L': np.float64(0.005869888197545057), 'machine_type_M': np.float64(0.003908244837436891), 'machine_type_H': np.float64(0.0037021449915201924)}
+Hutsegite-moten test independentea:
+
+failure_TWF:
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      1589
+           1       0.00      0.00      0.00        11
+
+    accuracy                           0.99      1600
+   macro avg       0.50      0.50      0.50      1600
+weighted avg       0.99      0.99      0.99      1600
+
+
+failure_HDF:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      1590
+           1       0.77      1.00      0.87        10
+
+    accuracy                           1.00      1600
+   macro avg       0.88      1.00      0.93      1600
+weighted avg       1.00      1.00      1.00      1600
+
+
+failure_PWF:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      1580
+           1       1.00      1.00      1.00        20
+
+    accuracy                           1.00      1600
+   macro avg       1.00      1.00      1.00      1600
+weighted avg       1.00      1.00      1.00      1600
+
+
+failure_OSF:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      1581
+           1       0.89      0.84      0.86        19
+
+    accuracy                           1.00      1600
+   macro avg       0.94      0.92      0.93      1600
+weighted avg       1.00      1.00      1.00      1600
+
+
+failure_RNF:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      1596
+           1       0.00      0.00      0.00         4
+
+    accuracy                           1.00      1600
+   macro avg       0.50      0.50      0.50      1600
+weighted avg       1.00      1.00      1.00      1600
+
+
+IsolationForest-en anomaliak benetako hutsegiteekin alderatuta:
+              precision    recall  f1-score   support
+
+           0       0.97      0.98      0.97      1546
+           1       0.20      0.15      0.17        54
+
+    accuracy                           0.95      1600
+   macro avg       0.59      0.56      0.57      1600
+weighted avg       0.94      0.95      0.95      1600
+
+Ebaluazio grafikoaren txostena: C:\wamp64\www\T4-erronka1\reports\training\txostena.html
+Ebaluazioa amaitu da; lehendik dagoen .pkl-a ez da ordezkatu.

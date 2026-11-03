@@ -154,13 +154,13 @@ def clean_training_data(data: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("No valid training rows remain after cleaning")
 
     # Garbiketaren emaitza terminalean erakusten dugu, prozesua auditatu ahal izateko.
-    print(f"Rows loaded: {rows_loaded}")
-    print(f"Duplicates removed: {duplicates_removed}")
-    print(f"Rows with missing required values removed: {missing_removed}")
-    print(f"Rows used for training: {len(data)}")
-    print(f"Machine quality distribution: {data[QUALITY_COLUMN].value_counts().to_dict()}")
-    print(f"Target distribution: {data[TARGET_COLUMN].value_counts().to_dict()}")
-    print("Failure type distribution:")
+    print(f"Kargatutako errenkadak: {rows_loaded}")
+    print(f"Kendutako bikoiztuak: {duplicates_removed}")
+    print(f"Beharrezko balio faltadun errenkada kenduak: {missing_removed}")
+    print(f"Entrenamendu-prozesurako errenkadak: {len(data)}")
+    print(f"Makinaren kalitatearen banaketa: {data[QUALITY_COLUMN].value_counts().to_dict()}")
+    print(f"Helburuaren banaketa: {data[TARGET_COLUMN].value_counts().to_dict()}")
+    print("Hutsegite-moten banaketa:")
     print(data[FAILURE_TYPE_COLUMNS].sum().to_dict())
     return data
 
@@ -260,8 +260,8 @@ def choose_failure_threshold(
             ),
         )
         print(
-            "Warning: no threshold reached the target recall; "
-            "selected the lowest-cost threshold."
+            "Oharra: atalase batek ere ez du Recall helburua lortu; "
+            "kostu txikieneko atalasea hautatu da."
         )
 
     selected = float(selected_metrics["threshold"])
@@ -318,17 +318,17 @@ def evaluate_failure_model(
             + tp * COST_TRUE_POSITIVE_EUR
             + tn * COST_TRUE_NEGATIVE_EUR
         )
-        print(f"\nOverall failure {label} (default threshold=0.50):")
+        print(f"\nHutsegite orokorra: {label} (atalase lehenetsia=0.50):")
         print(classification_report(labels, default_predictions, zero_division=0))
-        print("Confusion matrix:")
+        print("Nahasmen-matrizea:")
         print(confusion_matrix(labels, default_predictions, labels=[0, 1]).tolist())
         print(f"ROC-AUC: {roc_auc_score(labels, scores):.4f}")
-        print(f"\nCost-sensitive threshold: {threshold:.4f}")
+        print(f"\nKostuen arabera doitutako atalasea: {threshold:.4f}")
         print(classification_report(labels, tuned_predictions, zero_division=0))
-        print("Cost-sensitive confusion matrix:")
+        print("Kostuen arabera doitutako nahasmen-matrizea:")
         print(tuned_matrix.tolist())
         print(
-            "Cost-sensitive metrics: "
+            "Kostuen araberako metrikak: "
             f"recall={recall_score(labels, tuned_predictions, zero_division=0):.4f}, "
             f"precision={precision_score(labels, tuned_predictions, zero_division=0):.4f}, "
             f"f1={f1_score(labels, tuned_predictions, zero_division=0):.4f}, "
@@ -353,9 +353,9 @@ def evaluate_failure_model(
         }
 
     validation_metrics = summarize(
-        y_validation, validation_probabilities, "validation"
+        y_validation, validation_probabilities, "balidazioa"
     )
-    test_metrics = summarize(y_test, probabilities, "test")
+    test_metrics = summarize(y_test, probabilities, "test independentea")
 
     # APIan eta model_artifact-en gorde behar diren metrikak paketatu.
     metrics = {
@@ -374,12 +374,14 @@ def evaluate_failure_model(
     return threshold, metrics
 
 
-def main() -> None:
+def main(*, save_model: bool = True, report_dir: Path | None = None) -> dict:
     """Entrenamenduaren workflow osoa exekutatu eta eredua diskoan gorde.
 
     Urrats nagusiak: CSVa egiaztatu eta irakurri, garbitu, feature engineering
     aplikatu, datuak banatu, hiru ereduak entrenatu, ebaluatu eta APIak kargatuko
-    duen artifact-a sortu.
+    duen artifact-a sortu. ``save_model=False`` bada ez da .pkl-a ordezkatzen;
+    ``report_dir`` karpetan gordetzen dira grafikoak, taulak eta HTML txostena.
+    Entrenatutako artefaktua itzultzen da notebookak berrerabil dezan.
     """
 
     # Entrenamendu-fitxategia existitzen dela egiaztatu.
@@ -497,7 +499,7 @@ def main() -> None:
 
     # Pipeline barruko Random Forest-era iritsi feature importance lortzeko.
     classifier = overall_model.named_steps["classifier"]
-    print("Feature importance:")
+    print("Aldagaien garrantzia:")
     # OneHotEncoder-en ondoren geratzen diren zutabeen izenak berreskuratu.
     transformed_names = [
         *numeric_feature_columns,
@@ -516,7 +518,7 @@ def main() -> None:
     )
 
     # Hutsegite mota bakoitzaren balidazio-txostena inprimatu.
-    print("Failure type validation:")
+    print("Hutsegite-moten test independentea:")
     type_predictions = failure_type_model.predict(X_test)
     for index, column in enumerate(FAILURE_TYPE_COLUMNS):
         print(f"\n{column}:")
@@ -530,7 +532,7 @@ def main() -> None:
 
     # IsolationForest-ek -1 ematen du anomalia eta 1 ohiko datua denean.
     anomaly_flags = anomaly_model.predict(X_test) == -1
-    print("\nIsolationForest anomaly validation:")
+    print("\nIsolationForest-en anomaliak benetako hutsegiteekin alderatuta:")
     print(classification_report(y_test, anomaly_flags, zero_division=0))
 
     # APIak abioan kargatuko duen objektu bakarrean ereduak, ezaugarriak,
@@ -557,11 +559,37 @@ def main() -> None:
         "quality_values": {"H": "High", "M": "Medium", "L": "Low"},
     }
 
-    # ``models`` karpeta sortu ez badago eta artifact-a pickle bidez gorde.
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(model_artifact, MODEL_PATH)
-    print(f"Model saved to: {MODEL_PATH}")
+    # Notebookak eta terminalak ebaluazio grafiko bera erabiltzen dute.
+    # Inportazioa hemen egiteak APIaren kargan matplotlib ez behar izatea dakar.
+    from training_reports import create_training_report
+
+    report_dir = report_dir or ROOT / "reports" / "training"
+    create_training_report(
+        cleaned, model_artifact, X_train, y_train,
+        X_validation, y_validation, X_test, y_test, types_test,
+        report_dir=report_dir,
+    )
+    print(f"Ebaluazio grafikoaren txostena: {report_dir / 'txostena.html'}")
+
+    # Notebookaren ebaluazioak ez du ekoizpeneko .pkl-a automatikoki ordezkatzen.
+    # CLIaren portaera lehenetsia, aldiz, entrenatutako artefaktua gordetzea da.
+    if save_model:
+        MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(model_artifact, MODEL_PATH)
+        print(f"Eredua hemen gorde da: {MODEL_PATH}")
+    else:
+        print("Ebaluazioa amaitu da; lehendik dagoen .pkl-a ez da ordezkatu.")
+    return model_artifact
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="CNC ereduen offline entrenamendua eta ebaluazioa")
+    parser.add_argument(
+        "--no-save-model", action="store_true",
+        help="Ereduak ebaluatu eta txostena sortu, ekoizpeneko .pkl-a ordezkatu gabe",
+    )
+    parser.add_argument("--report-dir", type=Path, default=ROOT / "reports" / "training")
+    args = parser.parse_args()
+    main(save_model=not args.no_save_model, report_dir=args.report_dir)
