@@ -52,7 +52,9 @@ DATA_PATH = ROOT / "data" / "ai4i2020_train.csv"
 # APIak abioan kargatuko duen eredu-paketearen kokapena.
 MODEL_PATH = ROOT / "models" / "cnc_failure_model.pkl"
 
-# Ereduari emango zaizkion jatorrizko sentsore-aldagai numerikoak.
+# Ereduari emango zaizkion jatorrizko sentsore-aldagai numerikoak. ``timestamp``
+# ez da hemen sartzen: erronka hau snapshot-en sailkapen tabularra da, ez
+# denbora-serieen eredua, eta timestamp-ak data ikasteko leakage sor lezake.
 FEATURE_COLUMNS = [
     "air_temp_K",
     "process_temp_K",
@@ -75,10 +77,13 @@ FAILURE_TYPE_COLUMNS = [
     "failure_RNF",
 ]
 
-# Negozio-arazoaren kostuak: alerta batek teknikariaren 210 euroko bisita
-# eragiten du, eta detektatu gabeko matxura batek 1.200 euroko geldialdia.
-COST_REVIEW_EUR = 210.0
-COST_MISSED_FAILURE_EUR = 1200.0
+# Negozio-kostuen matrize ofiziala. FN batek makina hautsi eta linea geldiaraz
+# dezake; FP batek alferrikako ikuskapena eragiten du; TP-k mantentze prebentiboa
+# du eta TN-k ez du kostu gehigarririk.
+COST_FALSE_NEGATIVE_EUR = 5000.0
+COST_FALSE_POSITIVE_EUR = 200.0
+COST_TRUE_POSITIVE_EUR = 300.0
+COST_TRUE_NEGATIVE_EUR = 0.0
 # Mantentze prediktiboan matxura gehienak detektatzea nahi dugu; kostu txikiena
 # bilatuko da gutxienez recall-helburu hori betetzen duten atalaseen artean.
 MIN_TARGET_RECALL = 0.76
@@ -182,17 +187,19 @@ def choose_failure_threshold(
     y_true: pd.Series,
     probabilities: np.ndarray,
     target_recall: float = MIN_TARGET_RECALL,
-    review_cost: float = COST_REVIEW_EUR,
-    missed_failure_cost: float = COST_MISSED_FAILURE_EUR,
+    false_negative_cost: float = COST_FALSE_NEGATIVE_EUR,
+    false_positive_cost: float = COST_FALSE_POSITIVE_EUR,
+    true_positive_cost: float = COST_TRUE_POSITIVE_EUR,
+    true_negative_cost: float = COST_TRUE_NEGATIVE_EUR,
 ) -> tuple[float, dict[str, float]]:
     """Probabilitate-atalasea aukeratu, negozio-kostua minimizatuz.
 
     Ereduak 0 eta 1 arteko probabilitatea ematen du; atalaseak erabakitzen du
     noiz bihurtzen den probabilitate hori ``failure_predicted=True``. Mantentze
     prediktiboan faltsu negatiboak garestiak direnez, gutxienez
-    ``target_recall`` recall lortu nahi dugu. Hautagaien artean alerta eta
-    detektatu gabeko matxuren kostu oso txikiena duen atalasea aukeratzen da.
-    Horrela, F1 ez da negozio-erabakiaren ordezko bakarra.
+    ``target_recall`` recall lortu nahi dugu. Hautagaien artean FN, FP, TP eta
+    TN egoeren kostu oso txikiena duen atalasea aukeratzen da. Horrela, F1 edo
+    Accuracy ez dira negozio-erabakiaren ordezko bakarra.
     """
 
     # Atalase posible guztiak probatu. 0 eta 1 gehitzeak muturreko erabakiak
@@ -211,7 +218,12 @@ def choose_failure_threshold(
         ).ravel()
         candidate_recall = recall_score(y_true, predictions, zero_division=0)
         candidate_precision = precision_score(y_true, predictions, zero_division=0)
-        total_cost = (fp + tp) * review_cost + fn * missed_failure_cost
+        total_cost = (
+            fp * false_positive_cost
+            + fn * false_negative_cost
+            + tp * true_positive_cost
+            + tn * true_negative_cost
+        )
         candidate = {
             "threshold": float(threshold),
             "recall": float(candidate_recall),
@@ -262,8 +274,10 @@ def choose_failure_threshold(
         "validation_false_negatives": selected_metrics["false_negatives"],
         "validation_true_positives": selected_metrics["true_positives"],
         "validation_true_negatives": selected_metrics["true_negatives"],
-        "review_cost_eur": review_cost,
-        "missed_failure_cost_eur": missed_failure_cost,
+        "cost_false_negative_eur": false_negative_cost,
+        "cost_false_positive_eur": false_positive_cost,
+        "cost_true_positive_eur": true_positive_cost,
+        "cost_true_negative_eur": true_negative_cost,
     }
 
 
@@ -298,7 +312,12 @@ def evaluate_failure_model(
         tuned_predictions = scores >= threshold
         tuned_matrix = confusion_matrix(labels, tuned_predictions, labels=[0, 1])
         tn, fp, fn, tp = tuned_matrix.ravel()
-        tuned_cost = (fp + tp) * COST_REVIEW_EUR + fn * COST_MISSED_FAILURE_EUR
+        tuned_cost = (
+            fp * COST_FALSE_POSITIVE_EUR
+            + fn * COST_FALSE_NEGATIVE_EUR
+            + tp * COST_TRUE_POSITIVE_EUR
+            + tn * COST_TRUE_NEGATIVE_EUR
+        )
         print(f"\nOverall failure {label} (default threshold=0.50):")
         print(classification_report(labels, default_predictions, zero_division=0))
         print("Confusion matrix:")
@@ -344,8 +363,10 @@ def evaluate_failure_model(
         "default_confusion_matrix": test_metrics["default_confusion_matrix"],
         "tuned_confusion_matrix": test_metrics["tuned_confusion_matrix"],
         "tuned_threshold": round(threshold, 4),
-        "cost_review_eur": COST_REVIEW_EUR,
-        "cost_missed_failure_eur": COST_MISSED_FAILURE_EUR,
+        "cost_false_negative_eur": COST_FALSE_NEGATIVE_EUR,
+        "cost_false_positive_eur": COST_FALSE_POSITIVE_EUR,
+        "cost_true_positive_eur": COST_TRUE_POSITIVE_EUR,
+        "cost_true_negative_eur": COST_TRUE_NEGATIVE_EUR,
         "validation": validation_metrics,
         "test": test_metrics,
         **threshold_metrics,
@@ -516,7 +537,7 @@ def main() -> None:
     # atalasea eta ebaluazio-metrikak bildu.
     model_artifact = {
         # Bertsio berria: kostu bidezko atalasea eta validation/test ebaluazioa.
-        "version": 4,
+        "version": 5,
         "overall_model": overall_model,
         "failure_type_model": failure_type_model,
         "anomaly_model": anomaly_model,
@@ -525,9 +546,13 @@ def main() -> None:
         "failure_type_columns": FAILURE_TYPE_COLUMNS,
         "failure_threshold": failure_threshold,
         "costs": {
-            "review_eur": COST_REVIEW_EUR,
-            "missed_failure_eur": COST_MISSED_FAILURE_EUR,
+            "false_negative_eur": COST_FALSE_NEGATIVE_EUR,
+            "false_positive_eur": COST_FALSE_POSITIVE_EUR,
+            "true_positive_eur": COST_TRUE_POSITIVE_EUR,
+            "true_negative_eur": COST_TRUE_NEGATIVE_EUR,
         },
+        "data_mode": "tabular_snapshot",
+        "timestamp_used_as_feature": False,
         "evaluation": evaluation_metrics,
         "quality_values": {"H": "High", "M": "Medium", "L": "Low"},
     }

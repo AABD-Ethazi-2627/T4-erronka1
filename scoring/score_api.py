@@ -67,6 +67,14 @@ FAILURE_TYPE_NAMES = {
 # Atalase kritikoa alertaren lehentasuna adierazteko. Atalase ekonomikoa,
 # berriz, entrenatutako artifact-ean dago eta datu berriekin alda daiteke.
 CRITICAL_FAILURE_THRESHOLD = 0.8
+# Negozio-kostuen matrize ofiziala. Artifact zahar batek kostu hauek ez baditu,
+# APIak balio lehenetsi hauek erabiliko ditu.
+DEFAULT_COSTS_EUR = {
+    "false_negative_eur": 5000.0,
+    "false_positive_eur": 200.0,
+    "true_positive_eur": 300.0,
+    "true_negative_eur": 0.0,
+}
 
 
 class SensorReading(BaseModel):
@@ -109,6 +117,9 @@ class Prediction(BaseModel):
     failure_predicted: bool
     # 0 eta 1 arteko hutsegite-probabilitatea.
     failure_probability: float = Field(ge=0, le=1)
+    # Uneko erabakiaren espero den kostu ekonomikoa; threshold-ak eta kostu
+    # ofizialek erabilitako aukera (alerta edo ez alerta) kontuan hartzen dute.
+    expected_cost_eur: float = Field(ge=0)
     # Probabilitatearen eta anomaliaren arabera kalkulatutako alerta-maila.
     alert_level: Literal["OK", "KONTUZ", "LARRIA"]
     # Aurreikusitako hutsegite-moten zerrenda.
@@ -162,7 +173,7 @@ async def lifespan(app: FastAPI):
 # FastAPI aplikazio nagusia: Swagger /docs eta OpenAPI eskema sortzen ditu.
 app = FastAPI(
     title="CNC Failure Scoring API",
-    version="1.0.0",
+    version="1.1.0",
     lifespan=lifespan,
 )
 
@@ -343,6 +354,7 @@ def predict(payload: SensorReading, request: Request):
         )
         failure_type_columns = model.get("failure_type_columns", FAILURE_TYPE_COLUMNS)
         failure_threshold = float(model.get("failure_threshold", 0.5))
+        configured_costs = model.get("costs", {})
     else:
         # Artifact zaharrago batek Pipeline bakarra izan dezake.
         overall_model = model
@@ -351,6 +363,10 @@ def predict(payload: SensorReading, request: Request):
         feature_columns = FEATURE_COLUMNS
         failure_type_columns = []
         failure_threshold = 0.5
+        configured_costs = {}
+
+    # Artifact-ean gordetako kostuak hartu; falta direnak ofizialekin osatu.
+    costs = {**DEFAULT_COSTS_EUR, **configured_costs}
 
     # Payloadeko sentsoreak eta APIan kalkulatutako feature engineering-a
     # dictionary batean bildu.
@@ -385,6 +401,20 @@ def predict(payload: SensorReading, request: Request):
         logger.exception("Model prediction failed")
         raise HTTPException(status_code=500, detail="Model prediction failed") from exc
 
+    # Erabakiaren espero den kostua kalkulatu. Alerta emanez gero, TP/FP
+    # aukeren kostuen batez besteko ponderatua da; alerta ez emanez gero,
+    # TN/FN aukerena. Probabilitatea modeloaren irteera da.
+    if failure_predicted:
+        expected_cost = (
+            failure_probability * float(costs["true_positive_eur"])
+            + (1 - failure_probability) * float(costs["false_positive_eur"])
+        )
+    else:
+        expected_cost = (
+            failure_probability * float(costs["false_negative_eur"])
+            + (1 - failure_probability) * float(costs["true_negative_eur"])
+        )
+
     # Emaitza APIaren kontratuaren arabera sortu eta FastAPIk JSON bihurtuko du.
     return Prediction(
         timestamp=payload.timestamp,
@@ -392,6 +422,7 @@ def predict(payload: SensorReading, request: Request):
         machine_type=payload.machine_type,
         failure_predicted=failure_predicted,
         failure_probability=round(failure_probability, 4),
+        expected_cost_eur=round(expected_cost, 2),
         alert_level=_alert_level(
             failure_probability,
             anomaly_detected,
