@@ -1,5 +1,4 @@
 
-@'
 # Secrets i ingurune-aldagaiak
 .env
 .env.*
@@ -27,4 +26,10 @@ env/
 .DS_Store
 Thumbs.db
 desktop.ini
-'@ | Set-Content -Encoding utf8 .gitignore
+
+# Credenciales locales: el fichero cifrado config/secrets.enc.json si se puede versionar
+secrets/
+*.agekey
+keys.txt
+*.key
+config/secrets.json

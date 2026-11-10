@@ -1,27 +1,26 @@
 # CNC Guard — Hasteko Argibideak
 
-## 1. NFS karpeta muntatu (behin bakarrik)
+## 1. Windows + Docker Desktop
 
-```bash
-sudo mkdir -p /mnt/cnc-stream
-sudo mount ZERBITZARI_IP:/opt/cnc-stream /mnt/cnc-stream
-ls /mnt/cnc-stream/   # CSV fitxategiak ikusi behar dituzu
-```
+Docker Desktop abiarazi Linux edukiontziekin. [SECURITY.md](SECURITY.md) irakurri
+SOPS + age konfiguratzeko eta lehendik dagoen `.env` inportatzeko. SMB bolumenak
+`//192.168.75.150/cnc-stream` erabiltzen du; ez da NFS muntatu behar Windowsen.
 
 ## 2. Zerbitzuak abiarazi
 
-```bash
-docker compose up -d --build
-docker compose ps     # 6 zerbitzu "running" ikusi behar dituzu
+```powershell
+# Lehenik SECURITY.md: SOPS + age konfiguratu eta sekretuak inportatu/sortu.
+.\.venv\Scripts\python.exe scripts/security.py up
+.\.venv\Scripts\python.exe scripts/security.py compose ps
 ```
 
 | Zerbitzua | URLa | Erabiltzailea / Pasahitza |
 |---|---|---|
 | Kafka | kafka:9092 (Docker barnetik) | — |
-| NiFi | https://localhost:8443 | admin / adminpassword123 |
-| Kibana | http://localhost:5601 | — |
-| Elasticsearch | http://localhost:9200 | — |
-| Scoring API | http://localhost:8000/docs | — |
+| NiFi | https://localhost:8443 | NIFI_USERNAME / NIFI_PASSWORD (SOPS) |
+| Kibana | https://localhost:5601 | cncviewer / KIBANA_PASSWORD (SOPS) |
+| Elasticsearch | https://localhost:9200 | Autenticacion Basic; ver SECURITY.md |
+| Scoring API | https://localhost:8000/docs | Bearer SCORING_API_TOKEN (SOPS) |
 
 ## 3. Proiektuko fitxategiak
 
@@ -43,3 +42,16 @@ cnc-guard/
 ## 4. Erronkaren dokumentua
 
 `ENUNTZIATUA.md` irakurri — hiru faseetan zer egin azaltzen du.
+
+## Seguridad
+
+Kafka guarda ahora mensajes, offsets y metadatos en su volumen persistente.
+Consulta [KAFKA_PERSISTENCIA.md](KAFKA_PERSISTENCIA.md) para la migracion,
+verificacion y recuperacion de su copia cifrada.
+
+Consulta [SECURITY.md](SECURITY.md) para configurar SOPS + age en Windows, importar
+el `.env` existente al almacen cifrado y configurar las conexiones HTTPS y
+credenciales en NiFi. Desde el servidor puedes usar `https://localhost`.
+El grupo accede por `https://192.168.75.221` usando los mismos puertos de la tabla.
+El firewall limita el acceso a `192.168.75.0/24`. Comparte `output/acceso-grupo.zip`
+para que cada equipo instale la CA publica y consulte las URLs.

@@ -1,0 +1,3211 @@
+\n=== PAGE 1 ===\n 
+     
+         2026/11/13  Igor  Alfaro,  Egoitz  Urrutia,  Asier  Carabantes  eta  Asier  Vieira
+ 
+
+\n=== PAGE 2 ===\n 
+ 
+2  
+\n=== PAGE 3 ===\n 
+Aurkibidea  
+Sarrera  5 1.  Docker  bidezko  lan-ingurunea  6 1.1  Docker  eta  Docker  Compose  6 1.2  Erabilitako  zerbitzuak  6 1.3  Datuen  biltegiratzea  7 1.4  Talde-lana  7 2.  SMB,  Filebeat  eta  Kafka  8 2.1  Sarrera  8 2.2  Sareko  karpeta  partekatua  (SMB)  8 2.3  Docker  bidez  karpetara  sartzea  9 2.4  Filebeat-en  konfigurazioa  10 2.5  Apache  Kafka  12 2.6  Funtzionamenduaren  egiaztapena  13 2.7  Datuen  etengabeko  jasotzea  14 2.8  Segurtasuna  eta  kontuan  hartu  beharrekoak  15 3.  Apache  NiFi  fluxuaren  arkitektura  16 3.1  Sarrera  16 3.2  Fluxu  nagusia  16 3.3  Erroreen  kudeaketa  21 3.4  Datuen  biltegiratzea  23 3.5  Erabilitako  prozesadore  nagusiak  24 4.  Machine  Learning  eredua  eta  FastAPI  25 4.1  Sarrera  25 4.2  Entrenamendurako  datuak  25 4.3  Datuak  prestatzea  27 4.4  Erabilitako  Machine  Learning  ereduak  28 4.5  Ereduen  ebaluazioa  29 4.6  Eredua  gordetzea  31 4.7  FastAPI  zerbitzua  32 4.8  Entrenamenduaren  txostenak  34 4.9  Ereduaren  mugak  35 5.  Elasticsearch  eta  Kibana  36 5.1  Sarrera  36 5.2  Elasticsearch  eta  Kibana  36 5.3  CNC  –  Makinen  Monitorizazioa  36 5.4  CNC  –  Iragarpenak  eta  Alertak  38 5.5  CNC  –  Ereduaren  Ebaluazioa  eta  Kostuak  39 5.6  Dashboard-en  eguneraketa  43 6.  Ondorioak  eta  etorkizuneko  hobekuntzak  44 6.1  Ondorio  orokorrak  44 6.2  Lortutako  emaitzak  44 6.3  Mugak  eta  etorkizuneko  hobekuntzak  45 
+3  
+\n=== PAGE 4 ===\n 
+6.4  Azken  hausnarketa  45  
+ 
+4  
+\n=== PAGE 5 ===\n 
+Sarrera  
+CNC  Guard  CNC  makinen  egoera  aztertzeko  eta  izan  ditzaketen  matxurak  aurreikusteko  
+garatutako
+ 
+proiektua
+ 
+da.
+ 
+Horretarako,
+ 
+makinen
+ 
+telemetria-datuak
+ 
+eta
+ 
+adimen
+ 
+artifizialeko
+ 
+teknikak
+ 
+erabiltzen
+ 
+dira.
+ 
+Proiektuan,  CNC  makinen  simulagailu  batek  sortutako  datuak  jasotzen  dira,  hala  nola  
+tenperatura,
+ 
+biraketa-abiadura,
+ 
+momentua
+ 
+eta
+ 
+erremintaren
+ 
+higadura.
+ 
+Datu
+ 
+horiek
+ 
+prozesatu
+ 
+ondoren,
+ 
+Machine
+ 
+Learning
+ 
+eredu
+ 
+baten
+ 
+bidez
+ 
+aztertzen
+ 
+dira,
+ 
+matxurak
+ 
+gertatzeko
+ 
+probabilitatea
+ 
+kalkulatzeko
+ 
+eta
+ 
+arrisku-egoerak
+ 
+identifikatzeko.
+ 
+Sistema  osatzeko,  hainbat  teknologia  erabiltzen  dira,  besteak  beste,  Docker,  Filebeat,  
+Apache
+ 
+Kafka,
+ 
+Apache
+ 
+NiFi,
+ 
+FastAPI,
+ 
+Elasticsearch,
+ 
+Kibana
+ 
+eta
+ 
+MongoDB.
+ 
+Teknologia
+ 
+horien
+ 
+bidez,
+ 
+datuak
+ 
+jasotzeko,
+ 
+prozesatzeko,
+ 
+aztertzeko
+ 
+eta
+ 
+bistaratzeko
+ 
+prozesua
+ 
+automatizatzen
+ 
+da.
+ 
+Proiektuaren  helburua  mantentze-lan  prediktiboaren  funtzionamendua  erakustea  da,  
+makinen
+ 
+arazoak
+ 
+aldez
+ 
+aurretik
+ 
+antzemateko
+ 
+eta
+ 
+matxurek
+ 
+eragin
+ 
+ditzaketen
+ 
+kostuak
+ 
+murrizteko
+ 
+aukerak
+ 
+aztertuz.
+ 
+5  
+\n=== PAGE 6 ===\n 
+1.  Docker  bidezko  lan-ingurunea  
+1.1  Docker  eta  Docker  Compose  
+Proiektuko  zerbitzuak  antolatzeko  Docker  eta  Docker  Compose  erabiltzen  dira.  
+Docker-ek  aplikazioak  kontainerretan  exekutatzeko  aukera  ematen  du.  Kontainer  bakoitzak  
+bere
+ 
+aplikazioa
+ 
+eta
+ 
+funtzionatzeko
+ 
+behar
+ 
+dituen
+ 
+osagaiak
+ 
+ditu,
+ 
+baina
+ 
+guztiek
+ 
+zerbitzari
+ 
+bereko
+ 
+baliabideak
+ 
+erabiltzen
+ 
+dituzte.
+ 
+Docker  Compose-ren  bidez,  kontainer  guztiak  docker-compose.yml  fitxategi  bakarrean  
+definitzen
+ 
+dira.
+ 
+Fitxategi
+ 
+horretan
+ 
+zerbitzuak,
+ 
+sareak,
+ 
+bolumenak
+ 
+eta
+ 
+konfigurazio
+ 
+nagusiak
+ 
+zehazten
+ 
+dira.
+ 
+Horri  esker,  proiektu  osoa  komando  bakar  batekin  abiarazi  daiteke:  
+docker  compose  up  -d  –build  
+1.2  Erabilitako  zerbitzuak  
+CNC  Guard  proiektuan  honako  zerbitzuak  erabiltzen  dira:   Zerbitzua  Funtzioa  
+Filebeat  Sareko  karpetako  CSV  fitxategiak  irakurtzea  
+Apache  Kafka  Jasotako  telemetria-datuak  gordetzea  eta  banatzea  
+Apache  NiFi  Datuak  eraldatzea,  prozesatzea  eta  beste  zerbitzuetara  bidaltzea  
+FastAPI  (Scoring  API)  Machine  Learning  eredua  erabiliz  matxuren  iragarpenak  egitea  
+Elasticsearch  Telemetria-datuak,  iragarpenak  eta  ebaluazioak  gordetzea  
+Kibana  Elasticsearchen  gordetako  datuak  grafiko  eta  dashboard-en  bidez  bistaratzea  
+MongoDB  NiFi-n  sortutako  erroreen  informazioa  gordetzea  
+Zerbitzu  guztiak  cnc-net  izeneko  Docker  sarean  konektatuta  daude.  Horrela,  kontainerrak  
+elkarren
+ 
+artean
+ 
+komunikatu
+ 
+daitezke,
+ 
+bakoitzaren
+ 
+zerbitzu-izena
+ 
+erabiliz.
+ 
+6  
+\n=== PAGE 7 ===\n 
+Adibidez,  NiFi-k  scoring-api  zerbitzura  eskaerak  bidal  ditzake,  eta  Filebeat-ek  kafka  
+zerbitzura
+ 
+bidaltzen
+ 
+ditu
+ 
+jasotako
+ 
+datuak.
+ 
+1.3  Datuen  biltegiratzea  
+Docker-en  bolumenak  erabiltzen  dira  zerbitzuek  behar  dituzten  datuak  gordetzeko.  
+Bolumen  horiei  esker,  Kafka,  NiFi,  Elasticsearch  eta  MongoDB  bezalako  zerbitzuen  datuak  
+mantendu
+ 
+daitezke,
+ 
+kontainerrak
+ 
+berrabiarazi
+ 
+edo
+ 
+berriro
+ 
+sortzen
+ 
+direnean.
+ 
+Horrez  gain,  SMB  bidez  partekatutako  karpeta  Docker-en  muntatzen  da,  Filebeat-ek  CNC  
+makinen
+ 
+CSV
+ 
+fitxategiak
+ 
+irakurri
+ 
+ahal
+ 
+izateko.
+ 
+Karpeta  hori  irakurtzeko  soilik  konfiguratuta  dago,  jatorrizko  fitxategiak  ez  aldatzeko.  
+1.4  Talde-lana  
+Zerbitzu  guztiak  zerbitzari  berean  edukitzeak  talde-lana  errazten  du.  
+Taldeko  kideek  proiektuaren  atal  desberdinetan  lan  egin  dezakete,  baina  guztiek  ingurune  
+bera
+ 
+erabiltzen
+ 
+dute.
+ 
+Adibidez,
+ 
+kide
+ 
+batek
+ 
+NiFi-ko
+ 
+fluxua
+ 
+landu
+ 
+dezake,
+ 
+beste
+ 
+batek
+ 
+Machine
+ 
+Learning
+ 
+eredua
+ 
+prestatu,
+ 
+eta
+ 
+beste
+ 
+batek
+ 
+Kibana-ko
+ 
+dashboard-ak
+ 
+garatu.
+ 
+Horrela,  ez  da  beharrezkoa  taldekide  bakoitzak  Docker-eko  zerbitzu  guztiak  bere  
+ordenagailuan
+ 
+exekutatzea.
+ 
+Gainera,  konfigurazio  nagusia  docker-compose.yml  fitxategian  gordetzen  denez,  
+proiektuaren
+ 
+egitura
+ 
+antolatuta
+ 
+mantentzen
+ 
+da
+ 
+eta
+ 
+beharrezkoa
+ 
+denean
+ 
+berriro
+ 
+martxan
+ 
+jartzea
+ 
+errazten
+ 
+da.
+ 
+ 
+7  
+\n=== PAGE 8 ===\n 
+2.  SMB,  Filebeat  eta  Kafka  
+2.1  Sarrera  
+CNC  Guard  proiektuan,  Filebeat  eta  Apache  Kafka  erabiltzen  dira  CNC  makinen  
+telemetria-datuak
+ 
+jasotzeko
+ 
+eta
+ 
+prozesatzeko
+ 
+sistemara
+ 
+bidaltzeko.
+ 
+Datuak  sareko  karpeta  partekatu  batean  sortzen  dira,  CSV  fitxategien  bidez.  Filebeat-ek  
+fitxategi
+ 
+horiek
+ 
+irakurtzen
+ 
+ditu
+ 
+eta
+ 
+erregistroak
+ 
+Kafka-ra
+ 
+bidaltzen
+ 
+ditu.
+ 
+Ondoren,
+ 
+Apache
+ 
+NiFi-k
+ 
+Kafka-tik
+ 
+jasotzen
+ 
+ditu
+ 
+datuak,
+ 
+horiek
+ 
+prozesatzen
+ 
+jarraitzeko.
+ 
+Prozesu  honen  helburua  da  makinen  datuak  automatikoki  jasotzea,  fitxategiak  eskuz  kopiatu  
+edo
+ 
+bidali
+ 
+beharrik
+ 
+gabe.
+ 
+Horretarako,  honako  osagaiak  erabiltzen  dira:  
+●  SMB  karpeta  partekatua:  CNC  makinen  datuak  dituzten  CSV  fitxategiak  gordetzen  
+dira.
+ ●  Docker:  Filebeat  eta  Kafka  kontainerretan  exekutatzeko  erabiltzen  da.  ●  Filebeat:  CSV  fitxategiak  irakurri  eta  haien  edukia  Kafka-ra  bidaltzen  du.  ●  Apache  Kafka:  Filebeat-ek  bidalitako  mezuak  jasotzen  eta  gordetzen  ditu,  NiFi-k  
+gero
+ 
+kontsumitu
+ 
+ahal
+ 
+izateko.
+ 
+2.2  Sareko  karpeta  partekatua  (SMB)  
+CNC  makinen  datuak  sareko  karpeta  partekatu  batean  gordetzen  dira.  Karpeta  hori  SMB  
+protokoloaren
+ 
+bidez
+ 
+eskuragarri
+ 
+dago.
+ 
+Karpeta  partekatuaren  helbidea  honako  hau  da:  
+\\192.168.75.150\cnc-stream  
+Windows  sistematik  karpeta  horretara  sartzeko,  Z:  sare-unitatea  erabiltzen  da.  
+Karpeta  barruan  CSV  fitxategiak  sortzen  dira.  Fitxategi  bakoitzak  CNC  makinen  neurketei  
+buruzko
+ 
+informazioa
+ 
+jasotzen
+ 
+du.
+ 
+Fitxategien  izenek  antzeko  egitura  dute:  
+cnc_batch_20261016_060449_00001.csv  
+Fitxategi  horietan  makinen  identifikatzaileak,  neurketen  datak,  tenperaturak,  
+biraketa-abiadura
+ 
+eta
+ 
+beste
+ 
+hainbat
+ 
+datu
+ 
+jasotzen
+ 
+dira.
+ 
+Fitxategi  horiek  Filebeat-ek  irakurtzen  ditu,  eta  bertako  erregistroak  Kafka-ra  bidaltzen  dira.  
+8  
+\n=== PAGE 9 ===\n 
+2.3  Docker  bidez  karpetara  sartzea  
+Filebeat  Docker  kontainer  batean  exekutatzen  da.  Horregatik,  sareko  karpeta  partekatua  
+kontainerretik
+ 
+eskuragarri
+ 
+egon
+ 
+behar
+ 
+da.
+ 
+2.3.1  Hasierako  arazoa  
+Hasieran,  Windows-eko  Z:  sare-unitatea  Filebeat  kontainerrean  zuzenean  erabiltzen  saiatu  
+zen.
+ 
+Hala  ere,  kontainerrak  ezin  zituen  karpetako  fitxategiak  behar  bezala  irakurri.  
+Arazoa  zen  Windows-en  muntatutako  sare-unitatea  ez  zegoela  automatikoki  eskuragarri  
+Docker-eko
+ 
+Linux
+ 
+kontainerrarentzat.
+ 
+2.3.2  CIFS  bolumena  erabiltzea
+ 
+Arazoa  konpontzeko,  Docker-en  CIFS  bolumen  bat  erabiltzea  erabaki  zen.  
+CIFS  sareko  karpeta  partekatuetara  sartzeko  erabiltzen  den  protokoloa  da,  SMB-rekin  lotuta  
+dagoena.
+ 
+Bolumen  horren  bidez,  Docker-ek  zuzenean  konektatzen  du  sareko  karpetarekin,  
+Windows-eko
+ 
+Z:
+ 
+unitatearen
+ 
+beharrik
+ 
+gabe.
+ 
+Konfigurazioan  honako  ezaugarriak  erabiltzen  dira:  
+ Parametroa  Funtzioa  
+type:  cifs  SMB  karpeta  erabiltzeko  protokoloa  
+device  Sareko  karpetaren  helbidea  
+addr  SMB  zerbitzariaren  IP  helbidea  
+vers=3.0  SMB  protokoloaren  bertsioa  
+ro  Karpeta  irakurtzeko  soilik  muntatzea  
+ro  aukerari  esker,  Filebeat-ek  fitxategiak  irakur  ditzake,  baina  ezin  ditu  jatorrizko  karpetan  
+aldatu
+ 
+edo
+ 
+ezabatu.
+ 
+Bolumena  probatu  ondoren,  Docker-etik  CSV  fitxategiak  ikus  zitezkeela  egiaztatu  zen.  
+2.3.3  Docker  Compose  konfigurazioa  
+CIFS  bolumena  docker-compose.yml  fitxategian  definitzen  da.  
+9  
+\n=== PAGE 10 ===\n 
+Bolumenak  cnc-csv-share  i zena  du,  eta  Filebeat  kontainerrean  honako  direktorioan  
+muntatzen
+ 
+da:
+ 
+/datos-csv  
+Horrela,  Filebeat-ek  sareko  karpetako  CSV  fitxategiak  irakur  ditzake,  zuzenean  
+zerbitzariaren
+ 
+IP
+ 
+helbidea
+ 
+erabili
+ 
+beharrik
+ 
+gabe.
+ 
+Filebeat-en  konfigurazio-fitxategia  eta  bere  datuen  bolumena  ere  kontainerrera  konektatzen  
+dira.
+ 
+Azken  bolumen  horretan,  Filebeat-ek  irakurritako  fitxategien  jarraipenerako  informazioa  
+gordetzen
+ 
+du.
+ 
+2.4  Filebeat-en  konfigurazioa  
+Filebeat  arduratzen  da  sareko  karpetako  CSV  fitxategiak  irakurtzeaz  eta  Kafka-ra  bidaltzeaz.  
+Bere  konfigurazioa  honako  fitxategian  dago:  
+filebeat/filebeat.yml  
+2.4.1  CSV  fitxategiak  irakurtzea
+ 
+Fitxategiak  irakurtzeko,  Filebeat-en  filestream  motako  input-a  erabiltzen  da.  
+Konfigurazio  nagusia  honako  hau  da:  
+filebeat.inputs:    -  type:  filestream      id:  cnc-stream      paths:        -  /datos-csv/*.csv      exclude_lines:  ['^timestamp,']      file_identity:        path:  ~  
+Konfigurazio  horren  bidez,  Filebeat-ek  /datos-csv  direktorioko  CSV  fitxategiak  bilatzen  
+ditu.
+ 
+*.csv  adierazpenak  .csv  luzapena  duten  fitxategiak  aukeratzen  ditu.  
+Fitxategi  horietako  lerroak  irakurri  eta  Kafka-ra  bidaltzeko  prestatzen  dira.  
+2.4.2  CSV  fitxategien  goiburuak  baztertzea
+ 
+CSV  fitxategiek  lehen  lerroan  zutabeen  izenak  izaten  dituzte.  
+10  
+\n=== PAGE 11 ===\n 
+Adibidez,  timestamp  eremuarekin  hasten  den  lerro  bat.  
+Lerro  hori  ez  da  makina  baten  neurketa  bat.  Horregatik,  Filebeat-en  konfigurazioan  honako  
+aukera
+ 
+erabiltzen
+ 
+da:
+ 
+exclude_lines:  ['^timestamp,']  
+Aukera  horrek  timestamp,  testuarekin  hasten  diren  lerroak  baztertzen  ditu.  
+Horrela,  Kafka-ra  neurketen  erregistroak  bidaltzen  dira,  CSV  fitxategien  goiburuak  sartu  
+gabe.
+ 
+2.4.3  Irakurritako  fitxategien  jarraipena  
+Filebeat-ek  fitxategiak  identifikatzeko  eta  haien  irakurketa  kontrolatzeko  mekanismo  bat  
+erabiltzen
+ 
+du.
+ 
+Konfigurazio  honetan,  fitxategiak  haien  kokapenaren  arabera  identifikatzen  dira:  
+file_identity:    path:  ~  
+Filebeat-ek  irakurketaren  egoerari  buruzko  informazioa  gordetzen  du  filebeat-data  
+bolumenean.
+ 
+Horri  esker,  kontainerra  berrabiarazten  denean,  aurretik  irakurritako  fitxategien  informazioa  
+mantendu
+ 
+daiteke.
+ 
+Hala  ere,  fitxategi  baten  izena  edo  kokapena  aldatzen  bada,  Filebeat-ek  beste  fitxategi  bat  
+bezala
+ 
+identifikatu
+ 
+dezake.
+ 
+2.4.4  Datuak  Kafka-ra  bidaltzea  
+CSV  fitxategiak  irakurri  ondoren,  Filebeat-ek  erregistroak  Apache  Kafka-ra  bidaltzen  ditu.  
+Horretarako,  konfigurazio  hau  erabiltzen  da:  
+output.kafka:    hosts:  ["kafka:9092"]    topic:  "cnc-sensors-raw"    codec.format:      string:  '%{[message]}'  
+Konfigurazioaren  atal  nagusiak  honako  hauek  dira:  
+ 
+11  
+\n=== PAGE 12 ===\n 
+Parametroa  Funtzioa  
+hosts  Kafka  zerbitzariaren  helbidea  
+topic  Mezuak  gordeko  diren  Kafka  topic-a  
+codec.format  Mezuaren  edukia  bidaltzeko  formatua  
+kafka:9092  erabiltzen  da,  Kafka  zerbitzuaren  izena  kafka  delako  Docker  sarearen  
+barruan.
+ 
+cnc-sensors-raw  topic-ean  gordetzen  dira  makinen  neurketak.  
+codec.format  aukeraren  bidez,  CSV  lerroaren  edukia  bidaltzen  da,  JSON  egitura  
+gehigarririk
+ 
+sortu
+ 
+gabe.
+ 
+Horrela,  CSV  fitxategiko  datu-lerro  bakoitza  Kafka-ko  mezu  bat  bihurtzen  da.  
+2.5  Apache  Kafka  
+Apache  Kafka  Filebeat-ek  bidalitako  mezuak  jasotzeko  eta  gordetzeko  erabiltzen  da.  
+Proiektuan,  Kafka  Docker  kontainer  batean  exekutatzen  da,  apache/kafka:3.9.1  irudia  
+erabiliz.
+ 
+Konfigurazioan  KRaft  modua  erabiltzen  da.  Modu  horri  esker,  Kafka-k  ez  du  ZooKeeper  
+zerbitzurik
+ 
+behar.
+ 
+2.5.1  Kafka-ren  konfigurazioa  
+Kafka-k  bi  portu  nagusi  erabiltzen  ditu:  
+ Portua  Funtzioa  
+9092  Mezuak  bidaltzeko  eta  jasotzeko  komunikazioa  
+9093  KRaft  kontrolatzailearen  komunikazioa  
+Filebeat-ek  9092  portua  erabiltzen  du  mezuak  bidaltzeko.  
+Kafka-k  jasotako  informazioa  cnc-sensors-raw  topic-ean  gordetzen  du.  
+Topic  horretako  datuak  gero  beste  aplikazio  batzuek  irakur  ditzakete,  adibidez  Apache  
+NiFi-k.
+ 
+2.5.2  Kafka-ko  datuak  gordetzea  
+12  
+\n=== PAGE 13 ===\n 
+Kafka-ren  datuak  gordetzeko,  kafka-data  izeneko  Docker  bolumena  erabiltzen  da.  
+Bolumen  horren  bidez,  Kafka-ren  datuak  kontainerraren  fitxategi-sistematik  kanpo  
+mantentzen
+ 
+dira.
+ 
+Horrek  datuak  kontainerra  berrabiaraztean  mantentzen  laguntzen  du,  Kafka-ren  
+konfiguratutako
+ 
+atxikipen-epearen
+ 
+barruan.
+ 
+2.6  Funtzionamenduaren  egiaztapena  
+SMB,  Filebeat  eta  Kafka  arteko  konexioa  egiaztatzeko  hainbat  proba  egin  ziren.  
+Proba  horien  helburua  zen  CSV  fitxategiak  Docker-etik  irakur  zitezkeela  eta  haien  edukia  
+Kafka-ra
+ 
+iristen
+ 
+zela
+ 
+egiaztatzea.
+ 
+2.6.1  Sareko  karpetarako  sarbidea  egiaztatzea  
+Lehenengo,  Filebeat  kontainerretik  sareko  karpetako  fitxategiak  ikus  zitezkeen  egiaztatu  
+zen.
+ 
+Horretarako,  honako  komandoa  erabili  zen:  
+docker  exec  cnc-filebeat  ls  -la  /datos-csv  
+Komandoak  /datos-csv  direktorioko  fitxategiak  erakusten  ditu.  
+Proban  CSV  fitxategiak  agertu  ziren.  Beraz,  Docker-ek  SMB  karpetarako  sarbidea  zuela  
+egiaztatu
+ 
+zen.
+ 
+2.6.2  Kafka  topic-a  egiaztatzea  
+Ondoren,  Kafka-n  topic-a  existitzen  zela  egiaztatu  zen.  
+Horretarako,  honako  komandoa  erabili  zen:  
+docker  exec  cnc-kafka  /opt/kafka/bin/kafka-topics.sh  --bootstrap-server  localhost:9092  --list  
+Topic-en  zerrendan  cnc-sensors-raw  agertzen  zela  egiaztatu  zen.  
+2.6.3  Kafka-ko  mezuak  irakurtzea  
+Kafka-k  CSV  erregistroak  jaso  zituela  egiaztatzeko,  kontsolako  kontsumitzaile  bat  erabili  
+zen.
+ 
+ 
+13  
+\n=== PAGE 14 ===\n 
+docker  exec  -it  cnc-kafka  /opt/kafka/bin/kafka-console-consumer.sh  --bootstrap-server  localhost:9092  --topic  cnc-sensors-raw  --from-beginning  
+Komando  horrek  Kafka-n  gordeta  dauden  mezuak  irakurtzeko  aukera  ematen  du.  
+Proban  CSV  formatuko  erregistroak  agertu  ziren.  Adibidez:  
+2026-10-16T07:06:50Z,CNC-039,L,297.2,308.5,1513,42.9,212,0,0,0,0,0,0  
+Erregistroan  makinaren  identifikatzailea,  neurketaren  data  eta  sentsoreen  balioak  agertzen  
+dira.
+ 
+Horren  bidez,  Kafka-k  espero  zen  formatuko  datuak  zituela  egiaztatu  zen.  
+2.6.4  Filebeat-en  logak  kontsultatzea  
+Filebeat-en  funtzionamendua  aztertzeko,  kontainerraren  logak  kontsulta  daitezke.  
+Azken  bost  minutuetako  logak  ikusteko:  
+docker  logs  --since  5m  cnc-filebeat  
+Azken  50  lerroak  ikusteko:  
+docker  logs  --tail  50  cnc-filebeat  
+Komando  horiek  erabilgarriak  dira  fitxategien  irakurketan  edo  Kafka-rako  konexioan  arazorik  
+dagoen
+ 
+aztertzeko.
+ 
+2.7  Datuen  etengabeko  jasotzea  
+Filebeat  filestream  bidez  konfiguratu  da  CSV  fitxategiak  etengabe  irakurtzeko.  
+Horri  esker,  sareko  karpetan  fitxategi  berriak  sortzen  direnean,  Filebeat-ek  detektatu  eta  
+haien
+ 
+edukia
+ 
+Kafka-ra
+ 
+bidaltzeko
+ 
+aukera
+ 
+dago.
+ 
+Egindako  probetan,  Kafka-k  aurretik  gordetako  CSV  erregistroak  zituela  egiaztatu  zen.  
+Hala  ere,  dokumentatutako  proben  unean,  fitxategi  berrien  etengabeko  jasotzea  berariaz  
+egiaztatzea
+ 
+falta
+ 
+zen.
+ 
+Horretarako,  Kafka-ko  kontsumitzailea  martxan  mantendu  behar  da,  sareko  karpetan  CSV  
+fitxategi
+ 
+berriak
+ 
+sortzen
+ 
+diren
+ 
+bitartean.
+ 
+Mezu  berriak  agertzen  badira,  datuak  automatikoki  jasotzen  ari  direla  egiaztatu  daiteke.  
+14  
+\n=== PAGE 15 ===\n 
+2.8  Segurtasuna  eta  kontuan  hartu  beharrekoak  
+Sistemaren  konfigurazioan  hainbat  neurri  hartu  behar  dira  kontuan.  
+Sareko  karpetarako  sarbidea  
+SMB  karpeta  irakurtzeko  soilik  muntatzen  da.  Horrela,  Filebeat-ek  ezin  ditu  jatorrizko  
+fitxategiak
+ 
+aldatu
+ 
+edo
+ 
+ezabatu.
+ 
+Sarbide-datuak  
+SMB  zerbitzarira  konektatzeko  erabiltzen  diren  erabiltzailea  eta  pasahitza  .env fitxategian  
+gordetzea
+ 
+aurreikusten
+ 
+da.
+ 
+Fitxategi  hori  ez  da  GitHub-era  igo  behar,  sarbide-datuak  babesteko.  
+Filebeat-en  jarraipena  
+Filebeat-ek  irakurritako  fitxategien  informazioa  gordetzen  du.  Horregatik,  kontainerra  
+berrabiarazteak
+ 
+ez
+ 
+du
+ 
+esan
+ 
+nahi
+ 
+fitxategi
+ 
+guztiak
+ 
+berriro
+ 
+irakurriko
+ 
+direnik.
+ 
+Kafka-ren  konexioa  
+Filebeat-ek  eta  Kafka-k  Docker  sare  berean  komunikatzeko  aukera  izan  behar  dute.  
+Gainera,
+ 
+Filebeat-en
+ 
+konfiguratutako
+ 
+topic-aren
+ 
+izenak
+ 
+Kafka-ko
+ 
+topic-arekin
+ 
+bat
+ 
+etorri
+ 
+behar
+ 
+du.
+ 
+ 
+15  
+\n=== PAGE 16 ===\n 
+3.  Apache  NiFi  fluxuaren  arkitektura  
+3.1  Sarrera  
+CNC  Guard  proiektuan,  Apache  NiFi  erabiltzen  da  CNC  makinen  telemetria-datuak  
+prozesatzeko.
+ 
+NiFi-ren
+ 
+bidez,
+ 
+Apache
+ 
+Kafka-tik
+ 
+jasotako
+ 
+datuak
+ 
+prestatzen
+ 
+dira,
+ 
+adimen
+ 
+artifizialeko
+ 
+eredura
+ 
+bidaltzen
+ 
+dira
+ 
+eta
+ 
+lortutako
+ 
+emaitzak
+ 
+Elasticsearchen
+ 
+gordetzen
+ 
+dira.
+ 
+Sistemaren  helburua  makinen  egoera  aztertzea  eta  izan  ditzaketen  matxurak  aurreikustea  
+da.
+ 
+Horretarako,
+ 
+makinen
+ 
+tenperatura,
+ 
+biraketa-abiadura,
+ 
+momentua
+ 
+eta
+ 
+erremintaren
+ 
+higadura
+ 
+bezalako
+ 
+datuak
+ 
+erabiltzen
+ 
+dira.
+ 
+NiFi-ko  prozesamendua  bi  atal  nagusitan  banatzen  da:  
+●  Fluxu  nagusia:  Datuak  jaso,  bihurtu,  iragarpenak  egin,  emaitzak  sailkatu  eta  
+Elasticsearchen
+ 
+gordetzen
+ 
+ditu.
+ ●  Erroreen  kudeaketa:  Prozesamenduan  sortzen  diren  erroreak  jaso  eta  gordetzeko  
+erabiltzen
+ 
+da.
+ 
+Bi  atal  horiek  elkarren  artean  konektatuta  daude.  Fluxu  nagusiko  prozesadore  batean  
+erroreren
+ 
+bat
+ 
+gertatzen
+ 
+denean,
+ 
+dagokion
+ 
+informazioa
+ 
+erroreen
+ 
+kudeaketara
+ 
+bidaltzen
+ 
+da.
+ 
+ 
+3.2  Fluxu  nagusia  
+Fluxu  nagusia  Kafka-tik  datuak  jasotzen  hasten  da.  Ondoren,  datuak  JSON  formatura  
+bihurtzen
+ 
+dira
+ 
+eta
+ 
+bi
+ 
+adarretan
+ 
+banatzen
+ 
+dira:
+ 
+batean
+ 
+telemetria-datuak
+ 
+gordetzen
+ 
+dira,
+ 
+eta
+ 
+bestean
+ 
+makinen
+ 
+matxuren
+ 
+iragarpenak
+ 
+egiten
+ 
+dira.
+ 
+16  
+
+\n=== PAGE 17 ===\n 
+3.2.1  Datuak  Kafka-tik  jasotzea  
+Fluxuko  lehen  prozesadorea  Kafka  mezuak  kontsumitu  da.  Prozesadore  honek  Apache  
+Kafka-ko
+ 
+cnc-sensors-raw
+ 
+topic-etik
+ 
+jasotzen
+ 
+ditu
+ 
+CNC
+ 
+makinen
+ 
+telemetria-datuak.
+  Jasotako  datuak  CSV  formatuan  daude,  eta  makina  bakoitzaren  neurketak  jasotzen  dituzte.   Datuen  artean  honako  informazioa  dago:    Eremua  Esanahia  
+timestamp  Neurketa  egin  den  unea  
+machine_id  Makinaren  identifikatzailea  
+machine_type  Makina  mota  
+air_temp_K  Inguruko  airearen  tenperatura  
+process_temp_K  Prozesuaren  tenperatura  
+rpm  Biraketa-abiadura  
+torque_Nm  Makinaren  momentua  
+tool_wear_min  Erremintaren  higadura,  minututan   
+Datu  horiek  hurrengo  prozesadoreetara  bidaltzen  dira,  haien  formatua  egokitzeko.  
+3.2.2  CSV  formatutik  JSON  formatura  bihurtzea  
+Kafka-tik  jasotako  datuak  CSVetik  JSONera  bihurtu  izeneko  ConvertRecord  
+prozesadorera
+ 
+iristen
+ 
+dira.
+ 
+Prozesadore  honek  CSV  formatuko  datuak  irakurri  eta  JSON  formatura  bihurtzen  ditu.  
+Horretarako,
+ 
+CSVReader
+ 
+eta
+ 
+JsonRecordSetWriter
+ 
+zerbitzuak
+ 
+erabiltzen
+ 
+dira.
+ 
+JSON  formatua  erabiltzeak  datuak  beste  aplikazioekin  partekatzea  errazten  du,  batez  ere  
+FastAPI
+ 
+eta
+ 
+Elasticsearch
+ 
+bezalako
+ 
+zerbitzuekin.
+ 
+Bihurketa  ondo  egiten  bada,  datuek  fluxuan  aurrera  jarraitzen  dute.  Akatsen  bat  gertatzen  
+bada,
+ 
+errorea
+ 
+kudeatzeko
+ 
+atalera
+ 
+bidaltzen
+ 
+da.
+ 
+3.2.3  Datuak  bi  adarretan  banatzea  
+JSON  formatura  bihurtutako  datuak  Jatorrizko  telemetria  bikoiztu  prozesadorera  
+iristen
+ 
+dira.
+ 
+17  
+\n=== PAGE 18 ===\n 
+DuplicateFlowFile  prozesadoreak  datuen  kopia  bat  sortzen  du.  Horrela,  informazio  bera  
+bi
+ 
+bide
+ 
+desberdinetatik
+ 
+prozesatu
+ 
+daiteke:
+ 
+●  Telemetria  gordetzeko  adarra:  JSON  datuak  prestatzen  dira  eta  Elasticsearchen  
+gordetzen
+ 
+dira.
+ ●  Iragarpenen  adarra:  Datuak  FastAPI-ra  bidaltzen  dira,  makinen  matxurak  
+aurreikusteko.
+ 
+Banaketa  horri  esker,  telemetria-datuak  gordetzeko  eta  iragarpenak  egiteko  prozesuak  
+bereizita
+ 
+mantentzen
+ 
+dira.
+ 
+3.2.4  Telemetria-datuak  Elasticsearchen  gorde  
+Lehenengo  adarrean,  JoltTransformJSON  prozesadorea  erabiltzen  da  JSON  
+dokumentuaren
+ 
+egitura
+ 
+prestatzeko.
+ 
+Prozesadoreak  telemetriarako  behar  diren  eremuak  aukeratzen  ditu,  hala  nola  makinaren  
+identifikatzailea,
+ 
+tenperaturak,
+ 
+biraketa-abiadura
+ 
+eta
+ 
+erremintaren
+ 
+higadura.
+ 
+Ondoren,  Jatorrizko  telemetria  Elasticsearch-en  gorde  prozesadoreak  datuak  
+Elasticsearchera
+ 
+bidaltzen
+ 
+ditu.
+ 
+Datuak  cnc-sensors-raw  indizean  gordetzen  dira.  
+Indize  horrek  makinen  neurketak  kontsultatzeko  eta  Kibanan  aztertzeko  aukera  ematen  du.  
+3.2.5  Datuak  FastAPI-rako  prestatzea  
+Bigarren  adarrean,  lehenik  Benetako  etiketak  atera  prozesadorea  erabiltzen  da.  
+Prozesadore  honek  simulagailuak  emandako  matxuren  benetako  informazioa  ateratzen  du.  
+Besteak
+ 
+beste,
+ 
+makina
+ 
+batek
+ 
+matxura
+ 
+izan
+ 
+duen
+ 
+eta
+ 
+zer
+ 
+motatakoa
+ 
+izan
+ 
+den
+ 
+identifikatzeko
+ 
+eremuak
+ 
+jasotzen
+ 
+dira.
+ 
+Ondoren,  JSON  egitura  prestatu  izeneko  JoltTransformJSON  prozesadoreak  
+FastAPI-ra
+ 
+bidaliko
+ 
+den
+ 
+JSON
+ 
+dokumentua
+ 
+prestatzen
+ 
+du.
+ 
+Bertan,  iragarpena  egiteko  behar  diren  neurketak  bakarrik  aukeratzen  dira.  
+3.2.6  Matxuren  iragarpenak  egitea  
+Datuak  prest  daudenean,  Iragarpen  APIari  deitu  prozesadoreak  FastAPI  zerbitzuari  
+eskaera
+ 
+egiten
+ 
+dio.
+ 
+Horretarako,  InvokeHTTP  erabiltzen  da,  honako  konfigurazioarekin:  
+●  Metodoa:  POST  ●  Helbidea:  http://scoring-api:8000/predict  
+18  
+\n=== PAGE 19 ===\n 
+●  Datuen  formatua:  JSON  
+FastAPI  zerbitzuak  Machine  Learning  eredua  erabiltzen  du  jasotako  neurketak  aztertzeko  
+eta
+ 
+matxurak
+ 
+aurreikusteko.
+ 
+Erantzunean,  makinaren  egoerari  buruzko  informazioa  itzultzen  da.  Besteak  beste,  matxura  
+izateko
+ 
+probabilitatea,
+ 
+anomaliaren
+ 
+puntuazioa,
+ 
+alerta-maila
+ 
+eta
+ 
+aurreikusitako
+ 
+matxura
+ 
+motak
+ 
+jaso
+ 
+daitezke.
+ 
+Eskaeran  erroreren  bat  gertatzen  bada,  datuak  erroreen  kudeaketara  bideratzen  dira.  
+3.2.7  Iragarpen  emaitzak  ateratzea  
+FastAPI-ren  erantzuna  jaso  ondoren,  EvaluateJsonPath  prozesadoreak  erabiltzen  dira  
+JSON
+ 
+dokumentuko
+ 
+informazioa
+ 
+NiFi-ren
+ 
+atributuetara
+ 
+pasatzeko.
+ 
+Bi  prozesadore  erabiltzen  dira:  
+●  Iragarpen-atributuak  atera :  Makinaren  identifikatzailea,  matxura  izateko  
+probabilitatea,
+ 
+alerta-maila
+ 
+eta
+ 
+anomaliari
+ 
+buruzko
+ 
+datuak
+ 
+ateratzen
+ 
+ditu.
+ ●  Porrot  motak  eta  probabilitateak  atera :  Aurreikusitako  matxura  motak  
+eta
+ 
+bakoitzaren
+ 
+probabilitateak
+ 
+ateratzen
+ 
+ditu.
+ 
+Atributu  horiek  hurrengo  prozesadoreetan  erabiltzen  dira,  iragarpenak  sailkatzeko  eta  
+ebaluatzeko.
+ 
+3.2.8  Alertak  sailkatzea  
+Alerta-mailaren  arabera  bideratu  prozesadoreak  FastAPI-k  emandako  
+alerta-maila
+ 
+aztertzen
+ 
+du.
+ 
+Alerta  Esanahia  
+OK  Neurketa  egin  den  unea  
+KONTUZ  Arreta  behar  duen  egoera  
+LARRIA  Arrisku  handiko  egoera  
+Hiru  maila  horietako  edozein  jasotzen  denean,  datuak  Elasticsearchera  bidaltzen  dira.  
+Aurreikuspena  Elasticsearch-en  gorde  prozesadoreak  emaitzak  
+cnc-predictions
+ 
+indizean
+ 
+gordetzen
+ 
+ditu.
+ 
+Horrela,  Kibanan  makinen  arrisku-mailak,  matxuren  probabilitateak  eta  iragarpenak  ikusi  
+daitezke.
+ 
+3.2.9  Iragarpen  emaitzak  ebaluatzea  
+19  
+\n=== PAGE 20 ===\n 
+Iragarpena  Elasticsearchen  gorde  ondoren,  eredua  ebaluatzeko  prozesua  egiten  da.  
+Horretarako,  aurreikusitako  emaitza  makinaren  benetako  egoerarekin  alderatzen  da.  
+Konparazio  horren  bidez,  lau  emaitza  mota  bereizten  dira:  
+ Emaitza  Azalpena  
+TP  -  Benetako  positiboa  Matxura  bat  aurreikusi  da  eta  benetan  gertatu  da.  
+TN  -  Benetako  negatiboa  Ez  da  matxurarik  aurreikusi  eta  ez  da  gertatu.  
+FP  -  Positibo  faltsua  Matxura  bat  aurreikusi  da,  baina  ez  da  gertatu.  
+FN  -  Negatibo  faltsua  Ez  da  matxurarik  aurreikusi,  baina  gertatu  da.  
+Sailkapen  hori  Emaitza  predikzioa  sailkatu  izeneko  RouteOnAttribute  
+prozesadorearekin
+ 
+egiten
+ 
+da.
+ 
+Ebaluazioa  simulagailuak  emandako  benetako  matxura-etiketetan  oinarritzen  da.  
+3.2.10  Kostu  ekonomikoa  kalkulatzea  
+Iragarpenen  emaitzak  sailkatu  ondoren,  bakoitzari  kostu  ekonomiko  bat  esleitzen  zaio.  
+Horretarako,  lau  UpdateAttribute  prozesadore  erabiltzen  dira.  
+ Emaitza  Esleitutako  kostua  
+TP  -  Benetako  positiboa  300  €  
+TN  -  Benetako  negatiboa  0  €  
+FP  -  Positibo  faltsua  200  €  
+FN  -  Negatibo  faltsua  5000  €  
+Kostu  horiek  proiektuko  ebaluazioan  erabiltzen  diren  balioak  dira.  
+Adibidez,  matxura  bat  gertatu  arren  sistemak  aurreikusten  ez  badu,  5.000  euroko  kostua  
+esleitzen
+ 
+zaio.
+ 
+Aldiz,
+ 
+matxura
+ 
+behar
+ 
+bezala
+ 
+aurreikusten
+ 
+bada,
+ 
+300
+ 
+euroko
+ 
+kostua
+ 
+erabiltzen
+ 
+da.
+ 
+Horri  esker,  iragarpenen  zehaztasuna  aztertzeaz  gain,  akats  mota  bakoitzaren  eragin  
+ekonomikoa
+ 
+ere
+ 
+alderatu
+ 
+daiteke.
+ 
+20  
+\n=== PAGE 21 ===\n 
+3.2.11  Ebaluazioa  Elasticsearchen  gordetzea  
+Kostua  esleitu  ondoren,  Ebaluazio  ekonomikoa  JSON  bihurtu  prozesadoreak  
+emaitzaren
+ 
+JSON
+ 
+dokumentua
+ 
+sortzen
+ 
+du.
+ 
+Dokumentuan  honako  informazioa  jasotzen  da,  besteak  beste:  
+●  Makinaren  identifikatzailea  eta  mota.  ●  Neurketaren  data.  ●  Matxura  izateko  probabilitatea.  ●  Aurreikusitako  emaitza  eta  benetako  egoera.  ●  TP,  TN,  FP  edo  FN  sailkapena.  ●  Esleitutako  kostu  ekonomikoa.  ●  Alerta-maila  eta  anomaliari  buruzko  informazioa.  ●  Aurreikusitako  matxura  motak.  
+Azkenik,  Kostu-ebaluazioak  Elasticsearch-en  gorde  prozesadoreak  dokumentua  
+cnc-predictions-evaluations
+ 
+indizean
+ 
+gordetzen
+ 
+du.
+ 
+Indize  horretako  datuak  Kibanan  erabiltzen  dira  iragarpenen  emaitzak  eta  kostu  
+ekonomikoak
+ 
+aztertzeko.
+ 
+3.3  Erroreen  kudeaketa  
+Fluxu  nagusiaz  gain,  erroreak  kudeatzeko  beste  prozesu  multzo  bat  dago:  Erroreen  
+kudeaketa
+.
+ 
+Bere  helburua  da  datuak  prozesatzean  sortzen  diren  arazoen  informazioa  jasotzea  eta  
+gordetzea.
+ 
+Horrela,  errore  bat  gertatzen  denean,  haren  jatorria  aztertzeko  informazioa  eskuragarri  
+geratzen
+ 
+da.
+ 
+3.3.1  Erroreak  jasotzea  
+Fluxu  nagusiko  hainbat  prozesadorek  erroreen  kudeaketarekin  konexioa  dute.  
+Adibidez,  erroreak  sor  daitezke  egoera  hauetan:  
+●  CSV  datuak  JSON  formatura  bihurtzean.  ●  JSON  dokumentuaren  egitura  prestatzean.  ●  FastAPI  zerbitzuari  eskaera  egitean.  ●  JSON  dokumentuko  atributuak  ateratzean.  ●  Elasticsearchen  datuak  gordetzean.  ●  Iragarpenen  emaitzak  sailkatzean.  
+Errorea  detektatzen  denean,  dagokion  bidearen  bidez  Erroreak  sarrera  izeneko  Input  
+Port-era
+ 
+bidaltzen
+ 
+da.
+ 
+21  
+\n=== PAGE 22 ===\n 
+3.3.2  Erroreari  informazioa  gehitzea  
+Errorea  jasotakoan,  Erroreare  informazioa  gehitu  izeneko  UpdateAttribute  
+prozesadoreak
+ 
+informazio
+ 
+osagarria
+ 
+gehitzen
+ 
+du.
+ 
+Informazio  horri  esker,  errore  bakoitza  identifikatu  eta  sailkatu  daiteke.  
+Honako  datuak  gordetzeko  prestatzen  dira:  
+Eremua  Esanahia  
+error.fecha  Errorea  erregistratu  den  unea  
+error.proyecto  Proiektuaren  izena:  CNC  Guard  
+error.origen  Errorearen  jatorria:  NiFi  
+error.procesador  Errorea  sortu  duen  prozesadorea  
+error.tipo  Errore  mota  
+error.mensaje  Errorearen  azalpena  
+error.relacion  Errorea  zein  irteeratik  iritsi  den  
+error.uuid  FlowFile-aren  identifikatzailea  
+error.estado  Errorearen  egoera  
+error.excepcion  Salbuespen  teknikoaren  informazioa,  eskuragarri  badago  
+Gainera,  errore  motaren  arabera,  HTTP  erantzunari  edo  Elasticsearchi  lotutako  informazioa  
+ere
+ 
+jaso
+ 
+daiteke.
+ 
+Erroreen  hasierako  egoera  PENDIENTE_REVISION  bezala  ezartzen  da.  
+3.3.3  Erroreak  bi  adarretan  banatzea  
+Informazioa  gehitu  ondoren,  Errorea  eta  datua  banatu  prozesadoreak  FlowFile-aren  
+kopia
+ 
+bat
+ 
+sortzen
+ 
+du.
+ 
+Ondoren,  RouteOnAttribute  prozesadoreak  bi  adarretan  banatzen  ditu:  
+●  MongoDB  adarra:  Errorearen  atributuak  JSON  formatura  bihurtu  eta  datu-basean  
+gordetzen
+ 
+dira.
+ ●  Fitxategien  adarra:  Errorea  sortu  den  unean  FlowFile-ak  duen  edukia  fitxategi  
+batean
+ 
+gordetzen
+ 
+da.
+ 
+Horrela,  errorearen  informazioa  eta  prozesamenduko  datuak  bi  lekutan  gordetzeko  aukera  
+dago.
+ 
+22  
+\n=== PAGE 23 ===\n 
+3.3.4  Erroreak  MongoDB-n  gordetzea  
+Lehenengo  adarrean,  Errorea  JSON  bihurtu  prozesadoreak  errorearen  atributuak  
+JSON
+ 
+dokumentu
+ 
+batean
+ 
+biltzen
+ 
+ditu.
+ 
+Horretarako,  AttributesToJSON  erabiltzen  da.  
+Ondoren,  Errorea  MongoDB-n  gorde  prozesadoreak  dokumentua  MongoDB  
+datu-basean
+ 
+txertatzen
+ 
+du.
+ 
+MongoDB-n  gordetako  informazioa  erabil  daiteke  erroreak  kontsultatzeko,  zer  
+prozesadoretan
+ 
+gertatu
+ 
+diren
+ 
+ikusteko
+ 
+eta
+ 
+arazoen
+ 
+arrazoiak
+ 
+aztertzeko.
+ 
+3.3.5  Datuak  fitxategietan  gordetzea  
+Bigarren  adarrean,  Jatorrizko  datua  gorde  izeneko  PutFile  prozesadorea  erabiltzen  
+da.
+ 
+Prozesadore  honek  FlowFile-aren  edukia  honako  direktorioan  gordetzen  du:  
+/opt/nifi/errors  
+Gordetzen  den  edukia  errorea  gertatu  den  prozesamendu-puntuaren  araberakoa  da.  Beraz,  
+ez
+ 
+da
+ 
+beti
+ 
+Kafka-tik
+ 
+jasotako
+ 
+jatorrizko
+ 
+CSV
+ 
+fitxategia
+ 
+izango.
+ 
+Fitxategi  horiek  erabilgarriak  izan  daitezke  errorea  eragin  duten  datuak  aztertzeko  eta  
+arazoa
+ 
+identifikatzeko.
+ 
+3.4  Datuen  biltegiratzea  
+NiFi-k  prozesatutako  informazioa  Elasticsearchen  eta  MongoDB-n  gordetzeko  prestatuta  
+dago.
+ 
+3.4.1  Elasticsearch  
+Fluxu  nagusian  hiru  indize  erabiltzen  dira:  
+Indizea  Gordetzen  den  informazioa  
+cnc-sensors-raw  Makinen  telemetria-datuak  JSON  formatuan  
+cnc-predictions  FastAPI-k  egindako  iragarpenak  eta  alertak  
+cnc-predictions-evaluations  Iragarpenen  ebaluazioa  eta  kostu  ekonomikoak  
+Datu  horiek  Kibanan  erabil  daitezke  makinen  egoera,  matxuren  arriskua  eta  ereduaren  
+emaitzak
+ 
+bistaratzeko.
+ 
+23  
+\n=== PAGE 24 ===\n 
+3.4.2  MongoDB  
+MongoDB  erroreen  informazioa  gordetzeko  erabiltzen  da.  
+jefrys  datu-baseko  error-logs  bilduman  erroreen  erregistroak  txertatzeko  konfigurazioa  
+dago.
+ 
+Horri  esker,  erroreak  aparte  kontsultatu  daitezke,  fluxu  nagusiko  datuekin  nahastu  gabe.  
+3.4.3  Tokiko  fitxategiak  
+Erroreekin  lotutako  FlowFile-en  edukia  /opt/nifi/errors  direktorioan  gordetzeko  adarra  
+dago.
+ 
+Fitxategi  horiek  erroreen  azterketa  egiteko  informazio  osagarria  eskaintzen  dute.  
+3.5  Erabilitako  prozesadore  nagusiak  
+Honako  taulan  NiFi-ko  prozesadore  mota  nagusiak  eta  haien  funtzioak  laburbiltzen  dira.   Prozesadorea  Funtzioa  
+ConsumeKafka  Kafka-tik  datuak  jasotzea  
+ConvertRecord  CSV  formatua  JSON  bihurtzea  
+JoltTransformJSON  JSON  dokumentuaren  egitura  prestatzea  
+DuplicateFlowFile  Datuen  kopiak  sortzea  
+EvaluateJsonPath  JSON  dokumentuko  informazioa  ateratzea  
+IvokeHTTP  FastAPI  zerbitzuari  eskaerak  egitea  
+RouteOnAttribute  Datuak  atributuen  arabera  sailkatzea  
+UpdateAttribute  Atributuak  eta  kostuak  ezartzea  
+ReplaceText  Ebaluazioen  JSON  dokumentua  sortzea  
+PutElasticsearchJson  Datuak  Elasticsearchen  gordetzea  
+AttributesToJSON  Erroreen  atributuak  JSON  bihurtzea  
+PutMongo  Erroreak  MongoDB-n  gordetzea  
+PutFile  FlowFile-aren  edukia  fitxategi  batean  gordetzea    
+24  
+\n=== PAGE 25 ===\n 
+4.  Machine  Learning  eredua  eta  FastAPI  
+4.1  Sarrera  
+CNC  Guard  proiektuan,  Machine  Learning  ereduak  erabiltzen  dira  CNC  makinen  egoera  
+aztertzeko
+ 
+eta
+ 
+matxura
+ 
+posibleak
+ 
+identifikatzeko.
+ 
+Ereduak  entrenatzeko,  makinen  sentsoreen  neurketak  eta  matxurei  buruzko  informazioa  
+dituen
+ 
+datu-multzo
+ 
+bat
+ 
+erabiltzen
+ 
+da.
+ 
+Datu
+ 
+horien
+ 
+bidez,
+ 
+sistemak
+ 
+makinen
+ 
+egoera
+ 
+normalak
+ 
+eta
+ 
+matxurak
+ 
+dituzten
+ 
+egoerak
+ 
+bereizten
+ 
+ikasten
+ 
+du.
+ 
+Entrenamendua  amaitu  ondoren,  ereduak  fitxategi  batean  gordetzen  dira.  FastAPI  
+zerbitzuak
+ 
+fitxategi
+ 
+hori
+ 
+kargatzen
+ 
+du
+ 
+eta
+ 
+Apache
+ 
+NiFi-tik
+ 
+jasotako
+ 
+datuak
+ 
+aztertzeko
+ 
+erabiltzen
+ 
+du.
+ 
+Prozesua  bi  atal  nagusitan  banatzen  da:  
+●  Machine  Learning  ereduen  entrenamendua:  Datuak  prestatu,  ereduak  entrenatu  
+eta
+ 
+haien
+ 
+emaitzak
+ 
+ebaluatzen
+ 
+dira.
+ ●  FastAPI  zerbitzua:  Entrenatutako  ereduak  erabiltzen  dira  NiFi-tik  jasotako  datuekin  
+iragarpenak
+ 
+egiteko.
+ 
+4.2  Entrenamendurako  datuak  
+Ereduak  entrenatzeko,  ai4i2020_train.csv  izeneko  fitxategia  erabiltzen  da.  
+Fitxategi  horrek  CNC  makinen  neurketak  eta  matxurei  buruzko  etiketak  ditu.  Horri  esker,  
+ereduek
+ 
+sentsoreen
+ 
+balioen
+ 
+eta
+ 
+matxuren
+ 
+arteko
+ 
+erlazioak
+ 
+ikas
+ 
+ditzakete.
+ 
+Entrenamenduan  erabilitako  datu-multzoak  8.000  erregistro  ditu.  
+4.2.1  Erabilitako  aldagaiak  Ereduari  honako  sarrera-aldagaiak  ematen  zaizkio:    Aldagaia  Esanahia  
+air_temp_K  Airearen  tenperatura  
+process_temp_K  Prozesuaren  tenperatura  
+rpm  Biraketa-abiadura  
+torque_Nm  Makinaren  momentua  
+tool_wear_min  Erremintaren  higadura  
+25  
+\n=== PAGE 26 ===\n 
+machine_type  Makinaren  kalitate-maila:  H,  M  edo  L  
+Entrenamendurako  fitxategian  machine_failure  eremua  ere  badago.  Eremu  horrek  
+makina
+ 
+matxuratuta
+ 
+dagoen
+ 
+ala
+ 
+ez
+ 
+adierazten
+ 
+du:
+ 
+●  0 :  Ez  dago  matxurarik.  ●  1 :  Matxura  dago.  
+Eremu  hori  entrenamenduan  erabiltzen  da  ereduari  emaitza  zuzena  erakusteko,  baina  ez  da  
+iragarpen
+ 
+bat
+ 
+egiteko
+ 
+sarrera
+ 
+gisa
+ 
+erabiltzen.
+ 
+4.2.2  Datuen  garbiketa  
+Ereduak  entrenatu  aurretik,  datuak  garbitzen  dira.  
+Horretarako,  train_model.py  fitxategiko  clean_training_data  funtzioa  erabiltzen  da.  
+Garbiketan  honako  eragiketak  egiten  dira:  
+●  Zutabeen  izenetako  hutsuneak  kentzen  dira.  ●  Datu  numerikoak  zenbaki  formatura  bihurtzen  dira.  ●  Erregistro  bikoiztuak  ezabatzen  dira.  ●  Beharrezko  balioren  bat  falta  duten  erregistroak  baztertzen  dira.  ●  Makinen  kalitate-mailak  eta  matxuren  etiketak  baliozkoak  direla  egiaztatzen  da.  
+Egindako  entrenamenduan,  8.000  erregistroak  mantendu  ziren  garbiketaren  ondoren.  
+4.2.3  Datuen  azterketa  
+Entrenamenduaren  aurretik,  datuen  azterketa  bat  egiten  da  ( EDA ,  Exploratory  Data  
+Analysis).
+ 
+Azterketa  horretan  sentsoreen  balioen  banaketa,  makinen  kalitate-mailak,  matxura  motak  
+eta
+ 
+aldagaien
+ 
+arteko
+ 
+erlazioak
+ 
+aztertzen
+ 
+dira.
+ 
+Datu-multzoan  honako  banaketa  dago:  
+Egoera  Erregistroak  Ehunekoa  
+Matxurarik  gabe  7.729  %96,61  
+Matxurarekin  271  %3,39  
+Guztira  8000  %100   
+Ikusten  denez,  matxurarik  gabeko  erregistroak  askoz  gehiago  dira.  
+26  
+\n=== PAGE 27 ===\n 
+Horregatik,  ereduaren  zehaztasun  orokorra  bakarrik  aztertzea  ez  da  nahikoa.  Bereziki  
+garrantzitsua
+ 
+da
+ 
+benetako
+ 
+matxurak
+ 
+detektatzeko
+ 
+duen
+ 
+gaitasuna
+ 
+neurtzea.
+ 
+4.3  Datuak  prestatzea  
+Jatorrizko  aldagaiez  gain,  bi  aldagai  berri  kalkulatzen  dira.  
+Prozesu  horri  feature  engineering  deitzen  zaio.  
+4.3.1  Aldagai  berriak  
+Aldagai  Kalkulua  Esanahia  
+temp_diff  process_temp_K  -  air_temp_K  
+Prozesuaren  eta  airearen  arteko  tenperatura-aldea  
+power_est  rpm  x  torque_Nm  Potentziarekin  lotutako  adierazlea   
+Aldagai  berri  horien  bidez,  ereduari  informazio  gehiago  eskaintzen  zaio  makinen  egoera  
+aztertzeko.
+ 
+power_est  ez  da  potentzia  wattetan,  baizik  eta  biraketa-abiaduraren  eta  momentuaren  
+arteko
+ 
+biderkaduratik
+ 
+lortutako
+ 
+adierazlea.
+ 
+Bestalde,  machine_type  eremuko  H,  M  eta  L  balioak  zenbakizko  formatura  egokitzen  dira,  
+OneHotEncoder
+ 
+erabiliz.
+ 
+4.3.2  Datuak  banatzea  Datuak  hiru  multzotan  banatzen  dira,  bakoitza  helburu  desberdin  batekin  erabiltzeko.   Multzoa  Ehunekoa  Erregistroak  Erabilera  
+Entrenamendua  %60  4.800  Ereduak  ikasteko  
+Balidazioa  %20  1.600  Eredua  eta  erabaki-atalasea  ebaluatzeko  
+Testa  %20  1.600  Azken  emaitzak  egiaztatzeko  
+Banaketa  egiterakoan,  matxuren  proportzioa  antzeko  mantentzen  da  multzo  guztietan.  
+Testeko  datuak  ez  dira  erabiltzen  erabaki-atalasea  aukeratzeko.  Horrela,  azken  ebaluazioa  
+entrenamendutik
+ 
+bereizita
+ 
+egiten
+ 
+da.
+ 
+ 
+27  
+\n=== PAGE 28 ===\n 
+4.4  Erabilitako  Machine  Learning  ereduak  
+CNC  Guard  proiektuan  hiru  eredu  mota  erabiltzen  dira,  bakoitza  helburu  desberdin  batekin.   
+4.4.1  Random  Forest  -  Matxura  orokorra  Eredu  nagusia  RandomForestClassifier  da.   Random  Forest  algoritmoak  erabaki-zuhaitz  ugari  erabiltzen  ditu  datuak  aztertzeko.  Zuhaitz  
+horien
+ 
+emaitzak
+ 
+konbinatuz,
+ 
+makinaren
+ 
+egoerari
+ 
+buruzko
+ 
+iragarpena
+ 
+egiten
+ 
+da.
+  Proiektuan  100  erabaki-zuhaitz  erabiltzen  dira.   Eredu  honek  galdera  honi  erantzuten  dio:   Sentsoreen  neurketa  hauek  kontuan  hartuta,  matxura-egoera  bat  dagoela  aurreikusten  al  
+da?
+  Emaitza  0  eta  1  arteko  probabilitate  bat  da,  eta  probabilitate  horren  arabera  erabakitzen  da  
+matxura
+ 
+aurreikusten
+ 
+den
+ 
+ala
+ 
+ez.
+  
+4.4.2  Random  Forest  -  Matxura  motak
+ 
+Bigarren  eredua  MultiOutputClassifier  da,  Random  Forest  algoritmoarekin.  
+Eredu  honek  matxura  orokorra  aztertzeaz  gain,  zein  motatakoa  izan  daitekeen  aurreikusten  
+du.
+ 
+Bost  matxura  mota  bereizten  dira:  
+Kodea  Matxura  mota  
+TWF  Erremintaren  higadurarekin  lotutako  matxura  
+HDF  Beroa  kanporatzeko  arazoarekin  lotutako  matxura  
+PWF  Potentziarekin  lotutako  matxura  
+OSF  Gehiegizko  kargarekin  lotutako  matxura  
+RNF  Ausazko  matxura  
+Matxura  mota  bakoitza  bereizita  aztertzen  da.  
+Horrela,  FastAPI-k  matxura  mota  posibleak  eta  bakoitzaren  probabilitatea  itzul  ditzake.  
+ 
+28  
+\n=== PAGE 29 ===\n 
+4.4.3  Isolation  Forest  -  Anomaliak  detektatzea  
+Hirugarren  eredua  IsolationForest  da.  
+Eredu  hau  makinen  neurketa  ezohikoak  identifikatzeko  erabiltzen  da.  
+Entrenamenduan,  matxurarik  gabeko  erregistroak  erabiltzen  dira,  makinen  ohiko  portaera  
+ikasteko.
+ 
+Ondoren,  sentsoreen  neurketa  berri  bat  jasotzen  denean,  ereduak  aztertzen  du  balio  horiek  
+ohikoak
+ 
+diren
+ 
+ala
+ 
+ez.
+ 
+Anomalia  bat  detektatzeak  ez  du  esan  nahi  makina  nahitaez  matxuratuta  dagoenik.  
+Neurketa
+ 
+hori
+ 
+ohiko
+ 
+portaeratik
+ 
+aldentzen
+ 
+dela
+ 
+adierazten
+ 
+du.
+ 
+Hiru  eredu  horien  bidez,  matxura  orokorra,  matxura  motak  eta  portaera  ezohikoak  azter  
+daitezke.
+ 
+4.5  Ereduen  ebaluazioa  
+Ereduak  entrenatu  ondoren,  haien  emaitzak  ebaluatzen  dira.  
+Horretarako,  benetako  matxuren  etiketak  ereduek  egindako  iragarpenekin  alderatzen  dira.  
+Ebaluazioan  honako  neurriak  erabiltzen  dira:  
+Neurria  Esanahia  
+Accuracy  Iragarpen  guztien  artean  zenbat  diren  zuzenak  
+Precision  Aurreikusitako  matxuren  artean  zenbat  diren  benetakoak  
+Recall  Benetako  matxuren  artean  zenbat  detektatzen  diren  
+F1  Precision  eta  Recall  neurriak  bateratzen  dituen  balioa  
+ROC-AUC  Ereduak  bi  egoerak  bereizteko  duen  gaitasuna  
+CNC  Guard  proiektuan  Recall  neurriari  garrantzi  berezia  ematen  zaio,  detektatu  gabeko  
+matxura
+ 
+batek
+ 
+kostu
+ 
+ekonomiko
+ 
+handia
+ 
+izan
+ 
+dezakeelako.
+ 
+4.5.1  Erabaki-atalasea  aukeratzea
+ 
+Random  Forest  ereduak  matxura  izateko  probabilitate  bat  kalkulatzen  du.  
+Probabilitate  hori  erabaki  bihurtzeko,  atalase  bat  erabiltzen  da.  
+29  
+\n=== PAGE 30 ===\n 
+Hasieran,  %50eko  atalasea  erabil  daiteke,  baina  proiektuan  atalase  hori  kostu  ekonomikoen  
+arabera
+ 
+doitzen
+ 
+da.
+ 
+Helburua  da  matxura  gehienak  detektatzea,  ahalik  eta  kostu  txikienarekin.  
+Horretarako,  gutxienez  %76ko  Recall  lortzen  duten  atalaseen  artean  kosturik  txikiena  duen  
+aukera
+ 
+bilatzen
+ 
+da.
+ 
+Balidazioan  aukeratutako  atalasea  %16  izan  da.  
+Horrek  esan  nahi  du  ereduak  %16ko  edo  gehiagoko  probabilitatea  kalkulatzen  duenean,  
+matxura
+ 
+aurreikusten
+ 
+dela.
+ 
+ 
+4.5.2  Ebaluazio  ekonomikoa  
+Iragarpenen  emaitzei  kostu  ekonomiko  desberdinak  esleitzen  zaizkie.  
+Emaitza  Kostua  
+TP  -  Benetako  positiboa  300  €  
+TN  -  Benetako  negatiboa  0  €  
+FP  -  Positibo  faltsua  200  €  
+FN  -  Negatibo  faltsua  5.000€  
+Kostu  horiek  proiektuko  simulazioan  erabiltzen  diren  balioak  dira.  
+Matxura  bat  ez  detektatzeak  kostu  handiena  duenez,  erabaki-atalasea  aukeratzerakoan  
+bereziki
+ 
+kontuan
+ 
+hartzen
+ 
+da.
+ 
+4.5.3  Testeko  emaitzak   Azken  ebaluazioan,  aurretik  erabili  gabeko  1.600  erregistroko  test-multzoa  erabiltzen  da.   Random  Forest  eredu  nagusiak  honako  emaitzak  lortu  ditu:  
+30  
+
+\n=== PAGE 31 ===\n 
+ Neurria  Emaitza  
+Accuracy  %95,62  
+Recall  %83,33  
+Precision  %42,45  
+F1  0,5625  
+ROC-AUC  0,9647  
+Testeko  54  benetako  matxuretatik,  45  behar  bezala  detektatu  dira  eta  9  ez  dira  detektatu.  
+Era  berean,  61  alarma  faltsu  sortu  dira.  
+Emaitza  horiek  erakusten  dute  ereduak  matxura  gehienak  detektatzeko  gaitasuna  duela,  
+baina
+ 
+alarma
+ 
+faltsuak
+ 
+ere
+ 
+sortzen
+ 
+dituela.
+ 
+ 
+4.6  Eredua  gordetzea  
+Entrenamendua  amaitu  ondoren,  ereduak  eta  haien  konfigurazioa  fitxategi  bakarrean  
+gordetzen
+ 
+dira.
+ 
+Fitxategiaren  kokapena  honako  hau  da:  
+models/cnc_failure_model.pkl  
+Fitxategia  joblib  liburutegiaren  bidez  sortzen  da.  
+Bertan  hiru  ereduak,  erabilitako  aldagaiak,  erabaki-atalasea,  kostu  ekonomikoak  eta  
+ebaluazioaren
+ 
+informazioa
+ 
+gordetzen
+ 
+dira.
+ 
+31  
+
+\n=== PAGE 32 ===\n 
+Horri  esker,  FastAPI-k  entrenatutako  ereduak  zuzenean  karga  ditzake,  
+entrenamendu-prozesua
+ 
+berriro
+ 
+egin
+ 
+beharrik
+ 
+gabe.
+ 
+Entrenamendua  eta  iragarpenak  bi  prozesu  bereizi  dira.  APIak  ez  du  eredua  automatikoki  
+berrentrenatzen
+ 
+datu
+ 
+berriak
+ 
+jasotzen
+ 
+dituenean.
+ 
+4.7  FastAPI  zerbitzua  
+FastAPI  erabiltzen  da  entrenatutako  Machine  Learning  ereduak  beste  aplikazio  batzuetatik  
+erabiltzeko.
+ 
+Proiektuan,  Apache  NiFi-k  FastAPI-ra  bidaltzen  ditu  CNC  makinen  neurketak,  eta  FastAPI-k  
+iragarpenen
+ 
+emaitzak
+ 
+JSON
+ 
+formatuan
+ 
+itzultzen
+ 
+ditu.
+ 
+Zerbitzuaren  kodea  score_api.py  fitxategian  dago.  
+Docker-en  scoring-api  izeneko  zerbitzuan  exekutatzen  da,  8000  portuan.  
+4.7.1  Eredua  kargatzea
+ 
+FastAPI  zerbitzua  abiarazten  denean,  aurretik  entrenatutako  eredua  kargatzen  da.  
+Horretarako,  Docker-en  honako  fitxategia  erabiltzen  da:  
+/models/cnc_failure_model.pkl  
+Eredua  aplikazioa  abiaraztean  kargatzen  da,  eta  memorian  mantentzen  da.  
+Horrela,  NiFi-tik  eskaera  berri  bat  jasotzen  den  bakoitzean,  ez  da  beharrezkoa  eredua  
+diskoan
+ 
+berriro
+ 
+irakurtzea.
+ 
+4.7.2  APIaren  endpoint-ak  
+FastAPI  zerbitzuak  hiru  endpoint  nagusi  ditu.  
+Endpoint-a  Metodoa  Funtzioa  
+/  GET  APIa  martxan  dagoela  egiaztatzea  
+/health  GET  Eredua  kargatuta  dagoen  egiaztatzea  
+/predict  POST  Makinen  neurketak  aztertu  eta  iragarpena  egitea  
+NiFi-k  /predict  endpoint-a  erabiltzen  du  matxuren  iragarpenak  eskatzeko.  
+4.7.3  Datuak  jasotzea  
+32  
+\n=== PAGE 33 ===\n 
+NiFi-k  sentsoreen  informazioa  JSON  formatuan  bidaltzen  du.  
+FastAPI-k  jasotako  datuak  balidatzen  ditu,  Pydantic  erabiliz.  
+Besteak  beste,  makinaren  identifikatzailea,  mota,  neurketaren  data  eta  bost  sentsore-balioak  
+egiaztatzen
+ 
+dira.
+ 
+Datuak  baliozkoak  badira,  entrenamenduan  erabilitako  aldagai  berriak  kalkulatzen  dira  eta  
+ereduei
+ 
+bidaltzen
+ 
+zaizkie.
+ 
+4.7.4  Iragarpenak  egitea  
+Datuak  prest  daudenean,  FastAPI-k  hiru  ereduak  erabiltzen  ditu:  
+1.  Random  Forest  eredu  nagusiak  matxura  orokorraren  probabilitatea  kalkulatzen  du.  2.  Bigarren  ereduak  matxura  mota  posibleak  eta  haien  probabilitateak  aztertzen  ditu.  3.  Isolation  Forest  ereduak  neurketa  ezohikoa  den  ala  ez  egiaztatzen  du.  
+Ondoren,  emaitza  horiek  erabiltzen  dira  makina  bakoitzaren  alerta-maila  zehazteko.  
+4.7.5  Alerta  mailak
+ 
+FastAPI-k  hiru  alerta-maila  erabiltzen  ditu.  
+Alerta  Baldintza  Esanahia  
+OK  Probabilitatea  erabaki-atalasearen  azpitik  dago  eta  ez  da  anomaliarik  detektatu  
+Egoera  normala  
+KONTUZ  Erabaki-atalasea  gainditzen  da  edo  anomalia  bat  detektatzen  da  
+Arreta  behar  duen  egoera  
+LARRIA  Matxura-probabilitatea  %80  edo  handiagoa  da  
+Arrisku  handiko  egoera  
+LARRIA  alerta  lehentasun  handienekoa  da.  
+Alerta-mailak  matxura  orokorraren  probabilitatean  eta  anomaliaren  emaitzan  oinarritzen  dira.  
+4.7.6  Espero  den  kostua  kalkulatzea  
+FastAPI-k  iragarpenarekin  lotutako  espero  den  kostu  ekonomikoa  ere  kalkulatzen  du.  
+Horretarako,  matxura  izateko  probabilitatea  eta  aurretik  definitutako  kostuak  erabiltzen  dira.  
+Matxura  aurreikusten  bada,  mantentze-lanaren  eta  alarma  faltsuaren  kostuak  hartzen  dira  
+kontuan.
+ 
+33  
+\n=== PAGE 34 ===\n 
+Matxurarik  aurreikusten  ez  bada,  detektatu  gabeko  matxuraren  kostua  kontuan  hartzen  da.  
+Kalkulu  horren  emaitza  expected_cost_eur  eremuan  itzultzen  da.  
+Kostu  hori  estimazio  bat  da,  ez  benetan  gertatutako  gastua.  
+4.7.7  APIaren  erantzuna  
+Iragarpena  egin  ondoren,  FastAPI-k  JSON  dokumentu  bat  itzultzen  du.  
+Erantzunak  honako  informazioa  izan  dezake:  
+Eremua  Esanahia  
+machine_id  Makinaren  identifikatzailea  
+timestamp  Neurketaren  data  
+failure_predicted  Matxura  aurreikusten  den  ala  ez  
+failure_probability  Matxuraren  probabilitatea  
+failure_types  Aurreikusitako  matxura  motak  
+failure_type_probabilities  Matxura  mota  bakoitzaren  probabilitatea  
+anomaly_detected  Anomalia  detektatu  den  ala  ez  
+anomaly_score  Anomaliaren  puntuazioa  
+alert_level  Alerta-maila  
+expected_cost_eur  Espero  den  kostu  ekonomikoa  
+Informazio  hori  Apache  NiFi-ra  itzultzen  da.  
+NiFi-k  emaitzak  prozesatzen  ditu,  alerta-mailaren  arabera  sailkatzen  ditu  eta  
+Elasticsearchen
+ 
+gordetzen
+ 
+ditu.
+ 
+4.8  Entrenamenduaren  txostenak  
+Entrenamenduaren  emaitzak  dokumentatzeko,  training_reports.py  fitxategia  
+erabiltzen
+ 
+da.
+ 
+Fitxategi  horrek  taulak  eta  grafikoak  sortzen  ditu,  ereduaren  funtzionamendua  aztertzeko.  
+Besteak  beste,  honako  informazioa  sortzen  da:  
+●  Datuen  banaketa  eta  estatistikak.  ●  Ereduen  arteko  konparazioa.  
+34  
+\n=== PAGE 35 ===\n 
+●  Konfusio-matrizeak.  ●  ROC  eta  Precision–Recall  kurbak.  ●  Aldagaien  garrantzia.  ●  Matxura  mota  bakoitzaren  emaitzak.  ●  Anomalien  azterketa.  ●  Kostu  ekonomikoen  ebaluazioa.  
+Txostenak  reports/training/  karpetan  gordetzen  dira.  
+Gainera,  txostena.html  fitxategia  sortzen  da,  grafikoak  eta  emaitzak  dokumentu  bakar  
+batean
+ 
+kontsultatzeko.
+ 
+Bestalde,  02_training.ipynb  notebook-ak  entrenamenduaren  urratsak  eta  lortutako  
+emaitzak
+ 
+modu
+ 
+bisualean
+ 
+erakusten
+ 
+ditu.
+ 
+execute_training.py  fitxategiaren  bidez,  notebook-a  automatikoki  exekutatu  eta  bere  
+emaitzak
+ 
+eguneratu
+ 
+daitezke.
+ 
+4.9  Ereduaren  mugak  
+Erabilitako  Machine  Learning  eredua  uneko  sentsoreen  neurketetan  oinarritzen  da.  
+Horrek  esan  nahi  du  modeloak  neurketa  jakin  bat  aztertzen  duela,  eta  datu  horiek  
+matxura-egoera
+ 
+batekin
+ 
+lotuta
+ 
+dauden
+ 
+ala
+ 
+ez
+ 
+aurreikusten
+ 
+duela.
+ 
+Ereduak  ez  du  kalkulatzen  makina  zenbat  denbora  barru  matxuratuko  den.  
+Adibidez,  makinaren  tenperatura,  biraketa-abiadura  eta  higadura  jasotzen  direnean,  ereduak  
+matxura
+ 
+izateko
+ 
+probabilitatea
+ 
+kalkulatzen
+ 
+du.
+ 
+Hala
+ 
+ere,
+ 
+ez
+ 
+du
+ 
+esaten
+ 
+matxura
+ 
+ordubete,
+ 
+egun
+ 
+bat
+ 
+edo
+ 
+aste
+ 
+bat
+ 
+barru
+ 
+gertatuko
+ 
+den.
+ 
+Etorkizuneko  denbora  zehatz  bat  aurreikusteko,  denboran  zehar  jasotako  neurketak  eta  
+ondoren
+ 
+gertatutako
+ 
+matxurak
+ 
+erlazionatzen
+ 
+dituen
+ 
+beste
+ 
+entrenamendu
+ 
+bat
+ 
+beharko
+ 
+litzateke.
+ 
+Gainera,  eredua  entrenatzeko  datu-multzo  bat  erabiltzen  da,  eta  simulagailutik  jasotako  
+datuak
+ 
+iragarpenak
+ 
+egiteko
+ 
+erabiltzen
+ 
+dira.
+ 
+Horregatik,
+ 
+simulagailuko
+ 
+datuekin
+ 
+lortutako
+ 
+emaitzak
+ 
+bereizita
+ 
+egiaztatzea
+ 
+komeni
+ 
+da.
+ 
+ 
+35  
+\n=== PAGE 36 ===\n 
+5.  Elasticsearch  eta  Kibana  
+5.1  Sarrera  
+CNC  Guard  proiektuan,  Elasticsearch  eta  Kibana  erabiltzen  dira  makinen  datuak,  adimen  
+artifizialaren
+ 
+iragarpenak
+ 
+eta
+ 
+ebaluazioen
+ 
+emaitzak
+ 
+gordetzeko
+ 
+eta
+ 
+bistaratzeko.
+ 
+Apache  NiFi-k  prozesatutako  informazioa  Elasticsearchera  bidaltzen  du.  Ondoren,  
+Kibana-ren
+ 
+bidez,
+ 
+datu
+ 
+horiek
+ 
+grafiko,
+ 
+taula
+ 
+eta
+ 
+adierazle
+ 
+desberdinetan
+ 
+erakusten
+ 
+dira.
+ 
+Helburua  CNC  makinen  egoera  modu  errazean  kontsultatzea  da,  matxura-arriskuak  
+identifikatzeko
+ 
+eta
+ 
+Machine
+ 
+Learning
+ 
+ereduaren
+ 
+emaitzak
+ 
+aztertzeko.
+ 
+Informazioa  antolatzeko,  hiru  dashboard  sortu  dira:  ●  CNC  –  Makinen  Monitorizazioa:  Makinen  sentsoreen  neurketak  eta  egoera  orokorra  
+erakusten
+ 
+ditu.
+ ●  CNC  –  Iragarpenak  eta  Alertak:  Makinen  matxura-arriskuak  eta  alerta-mailak  
+bistaratzen
+ 
+ditu.
+ ●  CNC  –  Ereduaren  Ebaluazioa  eta  Kostuak:  Machine  Learning  ereduaren  emaitzak  eta  
+horien
+ 
+kostu
+ 
+ekonomikoak
+ 
+aztertzeko
+ 
+erabiltzen
+ 
+da.
+ 
+5.2  Elasticsearch  eta  Kibana  
+Elasticsearch  datuak  gordetzeko  eta  kontsultatzeko  erabiltzen  da.  
+CNC  Guard  proiektuan,  Apache  NiFi-k  Elasticsearchera  bidaltzen  ditu  makinen  
+telemetria-datuak,
+ 
+FastAPI-k
+ 
+egindako
+ 
+iragarpenak
+ 
+eta
+ 
+emaitzen
+ 
+ebaluazioak.
+ 
+Informazioa  indize  desberdinetan  gordetzen  da:  
+Indizea  Gordetzen  den  informazioa  
+cnc-sensors-raw  CNC  makinen  sentsoreen  neurketak  
+cnc-predictions  Matxuren  iragarpenak  eta  alerta-mailak  
+cnc-predictions-evaluations  
+Iragarpenen  ebaluazioa  eta  kostu  ekonomikoak  
+Kibana  Elasticsearchen  gordetako  datuak  ikusteko  erabiltzen  da.  
+Dashboard-en  bidez,  informazio  hori  modu  bisualean  antolatzen  da,  datuak  zuzenean  
+kontsultatu
+ 
+beharrik
+ 
+gabe.
+ 
+5.3  CNC  –  Makinen  Monitorizazioa  
+Dashboard  honek  CNC  makinen  sentsoreetatik  jasotako  informazioa  erakusten  du.  
+Bere  helburua  makinen  neurketak  aztertzea  eta  ohiko  balioetatik  aldentzen  diren  egoerak  
+identifikatzen
+ 
+laguntzea
+ 
+da.
+ 
+36  
+\n=== PAGE 37 ===\n 
+Horretarako,  hainbat  adierazle,  grafiko  eta  taula  erabiltzen  dira.  
+5.3.1  Adierazle  nagusiak
+ Dashboard-aren  goiko  aldean  makinen  informazio  orokorra  erakusten  da.  
+Adierazlea  Funtzioa  
+Makinak  monitorizatuta  Datuak  dituzten  makina  desberdinen  kopurua  
+Batez  besteko  aire-tenperatura  Makinen  aire-tenperaturaren  batez  bestekoa  
+Batez  besteko  biraketa-abiadura  Makinen  RPM  balioen  batez  bestekoa  
+Batez  besteko  momentu  eragilea  Momentuaren  batez  besteko  balioa  
+Batez  besteko  erremintaren  higadura  Erreminten  higaduraren  batez  bestekoa  
+Adierazle  horiek  aukeratutako  denbora-tarteko  datuekin  kalkulatzen  dira.  
+Horrela,  makinen  egoera  orokorraren  laburpena  ikus  daiteke.  
+5.3.2  Tenperaturen  bilakaera  
+Airearen  eta  prozesuaren  tenperaturen  bilakaera  grafikoak  bi  tenperaturen  
+aldaketak
+ 
+erakusten
+ 
+ditu
+ 
+denboran
+ 
+zehar.
+ 
+Grafikoan  airearen  tenperatura  eta  prozesuaren  tenperatura  alderatzen  dira.  
+Horri  esker,  tenperaturen  aldaketak  ikusi  eta  balio  ezohikoak  identifikatzen  lagundu  daiteke.  
+5.3.3  Tenperatura  handieneko  makinak  Aire-tenperatura  handieneko  10  makinak  grafikoak  tenperatura  altuenak  dituzten  
+hamar
+ 
+makinak
+ 
+erakusten
+ 
+ditu.
+ 
+Barra  horizontalen  bidez,  makina  bakoitzaren  balioak  alderatzen  dira.  
+Grafiko  hau  erabilgarria  da  tenperatura  altuagoko  makinak  azkar  identifikatzeko.  
+5.3.4  Erremintaren  higadura  Erremintaren  higadura  handieneko  10  makinak  grafikoan  higadura  handiena  
+duten
+ 
+makinak
+ 
+erakusten
+ 
+dira.
+ 
+Higadura  minututan  neurtzen  da.  
+Datu  horiek  erabilgarriak  dira  erreminten  egoera  aztertzeko  eta  higadura  handiena  duten  
+makinak
+ 
+identifikatzeko.
+ 
+5.3.5  Makinen  azken  neurketak  Makinen  azken  sentsore-neurketak  taulan  makina  bakoitzaren  neurketak  erakusten  
+dira.
+ 
+Taulak
+ 
+honako
+ 
+informazioa
+ 
+jasotzen
+ 
+du:
+ 
+37  
+\n=== PAGE 38 ===\n 
+●  Makinaren  identifikatzailea.  ●  Airearen  tenperatura.  ●  Prozesuaren  tenperatura.  ●  Biraketa-abiadura  (RPM).  ●  Momentua  (Nm).  ●  Erremintaren  higadura  (min).  ●  Azken  neurketaren  data  eta  ordua.  
+Taula  horri  esker,  makina  baten  datuak  zuzenean  kontsulta  daitezke,  grafikoak  aztertu  
+beharrik
+ 
+gabe.
+ 
+5.4  CNC  –  Iragarpenak  eta  Alertak  
+Bigarren  dashboard-ak  Machine  Learning  ereduak  egindako  iragarpenak  erakusten  ditu.  
+Bere  helburua  makinen  matxura-arriskuak  ikustea  eta  arreta  behar  duten  makinak  
+identifikatzea
+ 
+da.
+ 
+Horretarako,  FastAPI-k  kalkulatutako  probabilitateak  eta  alerta-mailak  erabiltzen  dira.  
+5.4.1  Makinen  eta  alerten  adierazleak  Dashboard-aren  goiko  aldean  makina  kopurua  eta  alerta-mailen  banaketa  erakusten  dira.  
+Hiru
+ 
+alerta-maila
+ 
+erabiltzen
+ 
+dira:
+ 
+Alerta  Esanahia  
+OK  Makinak  ez  du  alertarik  une  horretan  
+KONTUZ  Makinak  arreta  behar  duen  egoera  bat  du  
+LARRIA  Makinak  arrisku  handiko  egoera  bat  du  
+Alerta-mailak  FastAPI-k  kalkulatzen  ditu,  matxura-probabilitatea  eta  anomalien  detekzioa  
+kontuan
+ 
+hartuta.
+ 
+Adierazle  horiek  makinen  egoera  modu  azkarrean  kontsultatzeko  balio  dute.  
+5.4.2  Alerten  banaketa  Grafiko  zirkular  batean  makinen  alerta-mailen  banaketa  erakusten  da.  
+Horri  esker,  zenbat  makina  dauden  egoera  normalean  eta  zenbatek  behar  duten  arreta  ikus  
+daiteke.
+ 
+Alerten  ehunekoak  ere  erakusten  dira,  egoera  bakoitzaren  proportzioa  hobeto  ulertzeko.  
+5.4.3  Alerten  bilakaera  Alerten  bilakaera  grafikoak  alerta-mailen  erregistroak  denboran  zehar  erakusten  ditu.  
+Grafiko  honen  bidez,  denbora-tarte  bakoitzean  agertutako  alertak  azter  daitezke.  
+38  
+\n=== PAGE 39 ===\n 
+Horrela,  alerta-mailen  aldaketak  eta  arrisku-egoeren  bilakaera  ikus  daitezke.  
+5.4.4  Matxura-arrisku  handieneko  makinak  Hutsegite-arrisku  handieneko  10  makinak  grafikoak  matxura  izateko  probabilitate  
+handiena
+ 
+duten
+ 
+hamar
+ 
+makinak
+ 
+erakusten
+ 
+ditu.
+ 
+Makinak  arriskuaren  arabera  ordenatzen  dira,  probabilitate  handienetik  txikienera.  
+Grafiko  hau  erabilgarria  da  arrisku  handiena  duten  makinak  azkar  identifikatzeko.  
+5.4.5  Azken  iragarpenak  Dashboard-ak  makina  bakoitzaren  iragarpenen  informazioa  erakusten  duen  taula  bat  ere  
+badu.
+ 
+Taulak
+ 
+honako
+ 
+eremuak
+ 
+jasotzen
+ 
+ditu:
+ 
+Eremua  Esanahia  
+Makina  Makinaren  identifikatzailea  
+Alerta  Esleitutako  alerta-maila  
+Hutsegite-arriskua  (%)  Matxura-probabilitatea  ehunekotan  
+Azken  predikzioa  Iragarpenaren  data  eta  ordua  
+Taulan  alerta-mailak  koloreen  bidez  bereizten  dira.  
+Horrela,  makinaren  egoera  eta  arriskua  modu  errazean  identifikatu  daitezke.  
+5.5  CNC  –  Ereduaren  Ebaluazioa  eta  Kostuak  
+Hirugarren  dashboard-a  Machine  Learning  ereduaren  funtzionamendua  ebaluatzeko  
+erabiltzen
+ 
+da.
+ 
+Bere  helburua  da  egindako  iragarpenak  benetako  matxuren  informazioarekin  alderatzea  eta  
+emaitzen
+ 
+kostu
+ 
+ekonomikoa
+ 
+aztertzea.
+ 
+Dashboard  honek  ereduaren  zehaztasuna  eta  matxurak  detektatzeko  gaitasuna  aztertzeko  
+aukera
+ 
+ematen
+ 
+du.
+ 
+5.5.1  Precision  eta  Recall  Dashboard-aren  goiko  aldean  bi  adierazle  nagusi  erakusten  dira:  ●  Precision:  Matxura  gisa  aurreikusitako  kasuen  artean  zenbat  diren  benetako  matxurak  
+adierazten
+ 
+du.
+ ●  Recall:  Benetako  matxuren  artean  zenbat  detektatu  diren  adierazten  du.  
+Bi  neurri  horiek  garrantzitsuak  dira  eredua  ebaluatzeko.  
+CNC  Guard  proiektuan,  Recall  bereziki  garrantzitsua  da,  detektatu  gabeko  matxura  batek  
+kostu
+ 
+ekonomiko
+ 
+handia
+ 
+izan
+ 
+dezakeelako.
+ 
+39  
+\n=== PAGE 40 ===\n 
+5.5.2  Iragarpenen  sailkapena  Ereduaren  iragarpenak  lau  emaitza  motatan  sailkatzen  dira:  
+Emaitza  Azalpena  
+TP  –  Benetako  positiboa  Matxura  bat  behar  bezala  detektatu  da  
+TN  –  Benetako  negatiboa  Matxurarik  gabeko  egoera  behar  bezala  identifikatu  da  
+FP  –  Positivo  faltsua  Matxurarik  gabe  alarma  bat  sortu  da  
+FN  –  Negatibo  faltsua  Benetako  matxura  bat  ez  da  detektatu  
+Dashboard-ak  emaitza  mota  bakoitzaren  kopurua  erakusten  du.  
+Gainera,  barra-grafiko  baten  bidez,  sailkapenen  arteko  banaketa  ikus  daiteke.  
+5.5.3  Ebaluatutako  kasuak  
+Benetako  hutsegiteak  adierazleak  jasotako  datuetan  zenbat  matxura  erregistratu  diren  
+erakusten
+ 
+du.
+ 
+Ebaluatutako  kasu  bakarrak  adierazleak,  berriz,  zenbat  kasu  desberdin  ebaluatu  
+diren
+ 
+erakusten
+ 
+du.
+ 
+Adierazle  horien  bidez,  ebaluazioaren  tamaina  eta  benetako  matxuren  kopurua  kontsulta  
+daitezke.
+ 
+5.5.4  Kostu  ekonomikoak  Ereduaren  emaitza  bakoitzari  kostu  ekonomiko  bat  esleitzen  zaio.  Horretarako,  honako  
+balioak
+ 
+erabiltzen
+ 
+dira:
+ 
+Emaitza  Kostua  
+TP  –  Benetako  positiboa  300  €  
+TN  –  Benetako  negatiboa  0  €  
+FP  –  Positibo  faltsua  200  €  
+FN  –  Negatibo  faltsua  5.000  €  
+Kostu  horiek  proiektuko  simulazioaren  parte  dira.  
+Dashboard-ak  honako  adierazle  ekonomikoak  erakusten  ditu:  ●  Kostu  kalkulatua:  Ebaluatutako  emaitzei  esleitutako  kostu  osoa.  ●  Espero  den  kostua:  Ereduaren  probabilitateetan  oinarritutako  kostu  estimatua.  
+40  
+\n=== PAGE 41 ===\n 
+●  Aurrezki  simulatua:  Matxurak  detektatzeari  esker  lor  daitekeen  aurrezkiaren  
+estimazioa.
+ ●  Baztertutako  errepikapenak:  Ebaluazioaren  kalkuluetan  baztertutako  erregistro  
+errepikatuak.
+ 
+Horrela,  ereduaren  emaitzen  eragin  ekonomikoa  aztertu  daiteke.  
+5.5.5  Kostuen  bilakaera  Kostu  kalkulatuaren  eta  espero  den  kostuaren  bilakaera  grafikoak  bi  
+kostuen
+ 
+aldaketak
+ 
+erakusten
+ 
+ditu
+ 
+denboran
+ 
+zehar.
+ 
+Grafiko  honen  bidez,  kostu  kalkulatua  eta  espero  den  kostua  alderatu  daitezke.  
+5.5.6  Kostuen  banaketa  Kostuen  banaketa  sailkapen-emaitzaren  arabera  grafikoak  TP,  TN,  FP  eta  FN  
+emaitzen
+ 
+kostuak
+ 
+erakusten
+ 
+ditu.
+ 
+Barra-grafiko  honen  bidez,  kostu  handiena  sortzen  duten  emaitza  motak  identifikatu  
+daitezke.
+ 
+Bereziki,  FN  emaitzek  eragin  ekonomiko  handia  izan  dezakete,  detektatu  gabeko  matxurak  
+direlako.
+ 
+5.5.7  Sailkapenaren  bilakaera  Sailkapen-emaitzen  bilakaera  grafikoan  TP,  FP  eta  FN  emaitzen  kopuruak  denboran  
+zehar
+ 
+erakusten
+ 
+dira.
+ 
+Grafikoak  ereduaren  portaera  aztertzen  laguntzen  du,  denbora-tarte  bakoitzean  zenbat  
+iragarpen
+ 
+zuzen
+ 
+eta
+ 
+oker
+ 
+egin
+ 
+diren
+ 
+ikusteko.
+ 
+5.5.8  Kostu  handieneko  makinak  Kostu  handieneko  10  makinak  grafikoak  kostu  ekonomiko  handiena  duten  makinak  
+erakusten
+ 
+ditu.
+ 
+Makinak  kostuaren  arabera  ordenatzen  dira,  handienetik  txikienera.  
+Horrela,  eragin  ekonomiko  handiena  duten  makinak  identifikatu  daitezke.  
+5.5.9  Matxura  moten  banaketa  Hutsegite-moten  banaketa  grafikoak  aurreikusitako  matxura  moten  agerpenak  erakusten  
+ditu.
+ 
+Grafikoan  TWF,  HDF,  PWF,  OSF  eta  RNF  bezalako  matxura  motak  ager  daitezke,  
+erregistratutako
+ 
+datuen
+ 
+arabera.
+ 
+Horrela,  ereduan  zein  matxura  mota  agertzen  diren  eta  bakoitza  zenbat  aldiz  erregistratu  
+den
+ 
+ikus
+ 
+daiteke.
+ 
+5.5.10  Alarma  faltsuak  eta  detektatu  gabeko  matxurak  Dashboard-ak  FP  eta  FN  emaitzak  kontsultatzeko  taula  bat  dauka.  Taulak  honako  
+41  
+\n=== PAGE 42 ===\n 
+informazioa  erakusten  du:  ●  Iragarpenaren  data  eta  ordua.  ●  Makinaren  identifikatzailea.  ●  Sailkapenaren  emaitza  (FP  edo  FN).  ●  Benetako  egoera.  ●  Ereduaren  iragarpena.  ●  Matxura-arriskua  ehunekotan.  ●  Kostu  ekonomikoa.  ●  Espero  den  kostua.  
+Taula  hau  erabilgarria  da  ereduaren  akatsak  banan-banan  aztertzeko.  
+5.5.11  Makina  bakoitzaren  ebaluazio  ekonomikoa  Beste  taula  batean  makina  bakoitzaren  emaitza  ekonomikoak  erakusten  dira.  
+Bertan,  ebaluatutako  erregistroen  kopurua,  TP,  FP  eta  FN  emaitzak,  kostu  kalkulatua,  
+espero
+ 
+den
+ 
+kostua
+ 
+eta
+ 
+aurrezki
+ 
+simulatua
+ 
+kontsultatu
+ 
+daitezke.
+ 
+Horrela,  makina  bakoitzaren  emaitzak  bereizita  aztertu  daitezke.  
+5.5.12  Makinen  lehentasuna  eta  datuen  freskotasuna  Azken  taulak  makinen  egoerari  eta  azken  iragarpenari  buruzko  informazioa  erakusten  du.  
+Besteak
+ 
+beste,
+ 
+honako
+ 
+datuak
+ 
+jasotzen
+ 
+dira:
+ 
+Eremua  Esanahia  
+Makina  Makinaren  identifikatzailea  
+Kalitatea  Makinaren  H,  M  edo  L  kalitate-maila  
+Alerta  Uneko  alerta-maila  
+Arriskua  (%)  Matxura-probabilitatea  
+Espero  (€)  Espero  den  kostua  
+Anomalia  Anomalia  detektatu  den  ala  ez  
+Azkena  (UTC)  Azken  iragarpenaren  ordua  
+Minutuak  Azken  iragarpenetik  igarotako  denbora  
+42  
+\n=== PAGE 43 ===\n 
+Taula  honi  esker,  arrisku  handiena  duten  makinak  identifikatu  eta  azken  datuak  noiz  jaso  
+diren
+ 
+ikusi
+ 
+daiteke.
+ 
+5.6  Dashboard-en  eguneraketa  
+Kibana-ko  dashboard-ek  denbora-tarteak  aukeratzeko  aukera  ematen  dute.  
+Adibidez,  azken  15  minutuetako  edo  azken  orduko  informazioa  kontsulta  daiteke.  
+Gainera,  eguneraketa  automatikoa  konfiguratu  daiteke,  grafikoek  eta  adierazleek  datu  
+berriak
+ 
+erakusteko.
+ 
+CNC  Guard  proiektuan,  dashboard-ak  aldizka  eguneratzeko  konfigurazioa  erabiltzen  da,  
+makinen
+ 
+neurketak
+ 
+eta
+ 
+iragarpenak
+ 
+jarraitu
+ 
+ahal
+ 
+izateko.
+ 
+Kontuan  izan  behar  da  erakutsitako  emaitzak  aukeratutako  denbora-tartearen  araberakoak  
+direla.
+ 
+Horregatik,
+ 
+makina
+ 
+kopuruak,
+ 
+alertak
+ 
+eta
+ 
+ebaluazioen
+ 
+emaitzak
+ 
+aldatu
+ 
+daitezke.
+ 
+ 
+43  
+\n=== PAGE 44 ===\n 
+6.  Ondorioak  eta  etorkizuneko  hobekuntzak  
+6.1  Ondorio  orokorrak  
+CNC  Guard  proiektuaren  bidez,  CNC  makinen  datuak  automatikoki  jasotzeko,  prozesatzeko  
+eta
+ 
+aztertzeko
+ 
+sistema
+ 
+bat
+ 
+garatu
+ 
+da.
+ 
+Horretarako,
+ 
+Big
+ 
+Data
+ 
+eta
+ 
+adimen
+ 
+artifizialeko
+ 
+hainbat
+ 
+teknologia
+ 
+erabili
+ 
+dira,
+ 
+elkarren
+ 
+artean
+ 
+konektatutako
+ 
+lan-ingurune
+ 
+batean.
+ 
+Proiektuaren  hasieran,  Docker  bidezko  ingurune  partekatu  bat  prestatu  da,  taldeko  kideek  
+zerbitzari
+ 
+berean
+ 
+lan
+ 
+egin
+ 
+ahal
+ 
+izateko.
+ 
+Ondoren,
+ 
+Filebeat,
+ 
+Kafka
+ 
+eta
+ 
+NiFi
+ 
+erabiliz,
+ 
+simulagailuak
+ 
+sortutako
+ 
+CSV
+ 
+fitxategiak
+ 
+automatikoki
+ 
+jasotzeko
+ 
+eta
+ 
+prozesatzeko
+ 
+fluxua
+ 
+osatu
+ 
+da.
+ 
+Datu  horiek  Machine  Learning  ereduen  bidez  aztertzen  dira,  makinen  matxura-arriskuak  eta  
+portaera
+ 
+ezohikoak
+ 
+identifikatzeko.
+ 
+FastAPI
+ 
+erabiliz,
+ 
+entrenatutako
+ 
+ereduak
+ 
+NiFi-rekin
+ 
+konektatu
+ 
+dira,
+ 
+datu
+ 
+berriak
+ 
+jasotzen
+ 
+direnean
+ 
+iragarpenak
+ 
+egin
+ 
+ahal
+ 
+izateko.
+ 
+Azkenik,  Elasticsearch  eta  Kibana  erabiliz,  makinen  neurketak,  iragarpenak,  alertak  eta  
+ebaluazio
+ 
+ekonomikoak
+ 
+bistaratzeko
+ 
+hiru
+ 
+dashboard
+ 
+sortu
+ 
+dira.
+ 
+Horrela,  proiektuaren  helburu  nagusia  bete  da:  datuak  jasotzen  direnetik  emaitzak  
+bistaratzen
+ 
+diren
+ 
+arteko
+ 
+prozesu
+ 
+automatizatu
+ 
+bat
+ 
+osatzea.
+ 
+6.2  Lortutako  emaitzak  
+Proiektuan  garatutako  sistemak  hainbat  funtzionalitate  eskaintzen  ditu.  
+Alde  batetik,  CNC  makinen  telemetria-datuak  modu  automatikoan  jasotzen  dira,  fitxategiak  
+eskuz
+ 
+prozesatu
+ 
+beharrik
+ 
+gabe.
+ 
+Bestetik,  Machine  Learning  ereduek  jasotako  neurketak  aztertzen  dituzte,  matxura  
+posibleak,
+ 
+matxura
+ 
+motak
+ 
+eta
+ 
+anomaliak
+ 
+identifikatzeko.
+ 
+Eredu  nagusiaren  entrenamenduan,  testeko  54  matxuretatik  45  behar  bezala  detektatu  dira,  
+%83,33ko
+ 
+Recall
+ 
+lortuz.
+ 
+Emaitza
+ 
+horrek
+ 
+erakusten
+ 
+du
+ 
+ereduak
+ 
+matxura-egoera
+ 
+gehienak
+ 
+identifikatzeko
+ 
+gaitasuna
+ 
+duela,
+ 
+nahiz
+ 
+eta
+ 
+alarma
+ 
+faltsuak
+ 
+ere
+ 
+sortzen
+ 
+diren.
+ 
+Gainera,  iragarpenen  emaitzei  kostu  ekonomikoak  esleitu  zaizkie.  Horri  esker,  ereduaren  
+zehaztasuna
+ 
+aztertzeaz
+ 
+gain,
+ 
+detektatu
+ 
+gabeko
+ 
+matxurek
+ 
+eta
+ 
+alarma
+ 
+faltsuek
+ 
+izan
+ 
+dezaketen
+ 
+eragin
+ 
+ekonomikoa
+ 
+ere
+ 
+azter
+ 
+daiteke.
+ 
+Kibanan  sortutako  dashboard-ek  informazio  hori  guztia  modu  bisualean  kontsultatzeko  
+aukera
+ 
+ematen
+ 
+dute.
+ 
+ 
+44  
+\n=== PAGE 45 ===\n 
+6.3  Mugak  eta  etorkizuneko  hobekuntzak  
+ 
+6.4  Azken  hausnarketa  
+CNC  Guard  proiektuak  aukera  eman  du  ikasitako  hainbat  teknologia  sistema  bakar  batean  
+erabiltzeko
+ 
+eta
+ 
+haien
+ 
+arteko
+ 
+funtzionamendua
+ 
+ulertzeko.
+  Proiektuan  ez  da  Machine  Learning  eredu  bat  entrenatzera  bakarrik  mugatu  lana.  Datuak  
+jasotzeko
+ 
+azpiegitura
+ 
+prestatu
+ 
+da,
+ 
+informazioa
+ 
+prozesatzeko
+ 
+fluxuak
+ 
+sortu
+ 
+dira,
+ 
+erroreen
+ 
+kudeaketa
+ 
+landu
+ 
+da
+ 
+eta
+ 
+emaitzak
+ 
+aztertzeko
+ 
+dashboard-ak
+ 
+garatu
+ 
+dira.
+  Gainera,  Docker  bidezko  ingurune  partekatuak  talde-lana  erraztu  du,  proiektuaren  atal  
+desberdinak
+ 
+aldi
+ 
+berean
+ 
+garatzeko
+ 
+aukera
+ 
+emanez.
+  Orokorrean,  proiektuak  erakusten  du  Big  Data  eta  adimen  artifizialeko  teknologiak  elkartuz  
+industria-ingurune
+ 
+bateko
+ 
+datuak
+ 
+aztertzeko
+ 
+sistema
+ 
+bat
+ 
+garatu
+ 
+daitekeela.
+  CNC  Guard  etorkizunean  hobetu  eta  zabaldu  daitekeen  oinarria  da,  mantentze-lan  
+prediktiboaren
+ 
+arloan
+ 
+aplikazio
+ 
+praktikoak
+ 
+garatzeko.
+ 
+45  

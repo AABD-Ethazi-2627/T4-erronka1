@@ -15,6 +15,8 @@ import logging
 # ``os``: ingurune-aldagaietatik model-path-a irakurtzeko eta fitxategia
 # existitzen den egiaztatzeko.
 import os
+from pathlib import Path
+import secrets
 # ``Literal``: Pydantic-i onartutako testu-balioen zerrenda mugatzeko.
 from typing import Literal
 
@@ -25,13 +27,44 @@ import joblib
 import pandas as pd
 # FastAPI: HTTP aplikazioa sortzeko; HTTPException errore kontrolatuetarako eta
 # Request aplikazioaren state-ra iristeko.
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 # Pydantic: eskaera eta erantzun JSONen egitura eta motak balidatzeko.
 from pydantic import BaseModel, ConfigDict, Field
 
 
 # Logger honek APIaren abio-, karga- eta predikzio-akatsak jasotzen ditu.
 logger = logging.getLogger(__name__)
+
+bearer = HTTPBearer(auto_error=False)
+
+
+def load_api_token() -> str:
+    """Read the token from the mounted secret; never start without a valid key."""
+    path = os.getenv("SCORING_API_TOKEN_FILE", "/run/secrets/scoring_api_token")
+    try:
+        token = Path(path).read_text(encoding="utf-8").strip()
+    except OSError:
+        raise RuntimeError("Cannot read SCORING_API_TOKEN_FILE") from None
+    if len(token) < 32 or not token.isascii() or any(c.isspace() for c in token):
+        raise RuntimeError("API token must contain at least 32 ASCII characters without whitespace")
+    return token
+
+
+def require_api_token(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> None:
+    token = getattr(request.app.state, "api_token", None)
+    if not token:
+        raise HTTPException(status_code=503, detail="API authentication unavailable")
+    supplied = credentials.credentials if credentials else ""
+    if not secrets.compare_digest(supplied.encode("utf-8"), token.encode("utf-8")):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing API token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 # ``MODEL_PATH``: Docker-en /models/... izan ohi da; MODEL_PATH ingurune-
 # aldagaiak balio hori ordezkatu dezake.
@@ -162,12 +195,14 @@ async def lifespan(app: FastAPI):
     """
 
     # ``app.state`` objektuan partekatutako modeloa eta bere bidea gorde.
+    app.state.api_token = load_api_token()
     app.state.model = _load_model()
     app.state.model_path = MODEL_PATH
     # ``yield`` bitartean FastAPI aplikazioa eskaerak jasotzen ari da.
     yield
     # Aplikazioa ixtean modeloa askatu.
     app.state.model = None
+    app.state.api_token = None
 
 
 # FastAPI aplikazio nagusia: Swagger /docs eta OpenAPI eskema sortzen ditu.
@@ -199,7 +234,6 @@ def health(request: Request):
     return {
         "status": "ok",
         "model_loaded": model is not None,
-        "model_path": request.app.state.model_path,
     }
 
 
@@ -322,7 +356,7 @@ def _alert_level(
     return "OK"
 
 
-@app.post("/predict", response_model=Prediction)
+@app.post("/predict", response_model=Prediction, dependencies=[Depends(require_api_token)])
 def predict(payload: SensorReading, request: Request):
     """Sentsore-irakurketa jaso eta mantentze-predikzioa itzuli.
 

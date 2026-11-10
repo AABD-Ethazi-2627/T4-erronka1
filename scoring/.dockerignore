@@ -1,0 +1,13 @@
+# Evitar que COPY . . incorpore secretos o archivos de desarrollo.
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+.git/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/

@@ -1,0 +1,3 @@
+-r requirements.txt
+-r ../scripts/requirements-security.txt
+httpx==0.27.2
