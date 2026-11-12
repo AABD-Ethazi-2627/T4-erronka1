@@ -32,6 +32,7 @@ SECRET_NAMES = (
     "SCORING_API_TOKEN", "KIBANA_SECURITY_KEY", "KIBANA_SAVED_OBJECTS_KEY",
     "KIBANA_REPORTING_KEY",
 )
+OPTIONAL_SECRET_NAMES = ("KIBANA_ADMIN_PASSWORD",)
 REQUIRED = (*SECRET_NAMES, "NIFI_USERNAME", "MONGO_USERNAME", "SMB_USERNAME",
             "KIBANA_USERNAME", "TLS_CA_CERT", "TLS_CA_KEY",
             "TLS_ELASTICSEARCH_CERT", "TLS_ELASTICSEARCH_KEY",
@@ -162,6 +163,8 @@ def validate(values):
         minimum = 12 if name == "NIFI_PASSWORD" else 1 if name in ("SMB_PASSWORD", "MONGO_PASSWORD") else 32
         if len(values[name]) < minimum:
             raise ValueError(f"{name} must contain at least {minimum} characters")
+    if values.get("KIBANA_ADMIN_PASSWORD") and len(values["KIBANA_ADMIN_PASSWORD"]) < 32:
+        raise ValueError("KIBANA_ADMIN_PASSWORD must contain at least 32 characters")
     token = values["SCORING_API_TOKEN"]
     if not token.isascii() or any(c.isspace() for c in token):
         raise ValueError("SCORING_API_TOKEN must be ASCII without whitespace")
@@ -471,15 +474,65 @@ def elastic_accounts(values, runtime):
     print("Configured kibana_system, cnc_nifi and the Kibana read-only user (cnc-*).")
 
 
+def create_kibana_admin(values, runtime):
+    """Create the dashboard editor account without changing the viewer account."""
+    password = values.get("KIBANA_ADMIN_PASSWORD") or secrets.token_urlsafe(36)
+    context = ssl.create_default_context(cafile=str(runtime / "ca.crt"))
+    auth = base64.b64encode(f"elastic:{values['ELASTIC_PASSWORD']}".encode()).decode()
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(context=context))
+
+    def request(path, body):
+        req = urllib.request.Request(
+            "https://localhost:9200" + path,
+            data=json.dumps(body).encode(),
+            headers={"Authorization": f"Basic {auth}", "Content-Type": "application/json"},
+            method="PUT",
+        )
+        try:
+            with opener.open(req, timeout=10) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as error:
+            raise RuntimeError(f"Elasticsearch admin account request failed with HTTP {error.code}") from None
+
+    request("/_security/role/cnc_dashboard_editor", {
+        "cluster": ["monitor"],
+        "indices": [{"names": ["cnc-*"], "privileges": ["read", "view_index_metadata"]}],
+        "applications": [{
+            "application": "kibana-.kibana",
+            "privileges": ["all"],
+            "resources": ["space:default"],
+        }],
+    })
+    request("/_security/user/cncadmin", {
+        "password": password,
+        "roles": ["cnc_dashboard_editor"],
+        "enabled": True,
+    })
+    if "KIBANA_ADMIN_PASSWORD" not in values:
+        updated = dict(values)
+        updated["KIBANA_ADMIN_PASSWORD"] = password
+        recipient = captured(["age-keygen", "-y", os.environ["SOPS_AGE_KEY_FILE"]]).decode().strip()
+        ciphertext = captured(
+            ["sops", "encrypt", "--age", recipient, "--input-type", "json", "--output-type", "json",
+             "--filename-override", str(ENCRYPTED)],
+            data=json.dumps(updated).encode(),
+        )
+        temporary = ENCRYPTED.with_suffix(".admin.tmp")
+        temporary.write_bytes(ciphertext)
+        temporary.replace(ENCRYPTED)
+    print("Created cncadmin with dashboard editing permissions. Password stored only in SOPS; use 'show KIBANA_ADMIN_PASSWORD' locally.")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     initialize = commands.add_parser("init", help="Generate the encrypted configuration once, on this computer")
     initialize.add_argument("--import-env", metavar="PATH")
     commands.add_parser("up", help="Prepare private runtime files, start ES, provision accounts, then start services")
+    commands.add_parser("create-kibana-admin", help="Create or refresh the dashboard editor account cncadmin")
     commands.add_parser("down", help="Stop containers without deleting data volumes, then clear runtime files")
     show = commands.add_parser("show", help="Reveal one value locally for NiFi or login setup")
-    show.add_argument("name", choices=REQUIRED)
+    show.add_argument("name", choices=(*REQUIRED, *OPTIONAL_SECRET_NAMES))
     compose_parser = commands.add_parser("compose", help="Run a Compose command using the encrypted configuration")
     compose_parser.add_argument("args", nargs=argparse.REMAINDER)
     commands.add_parser("doctor", help="Report process identity and key access errors without displaying secrets")
@@ -507,6 +560,8 @@ def main():
         compose(values, runtime, ["up", "-d", "elasticsearch"])
         elastic_accounts(values, runtime)
         compose(values, runtime, ["up", "-d", "--build", "--force-recreate"])
+    elif args.command == "create-kibana-admin":
+        create_kibana_admin(values, runtime)
     elif args.command == "down":
         compose(values, runtime, ["down"])
         shutil.rmtree(runtime)
