@@ -1,0 +1,73 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "properties": {
+      "alert_level": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "anomaly_detected": {
+        "type": "boolean"
+      },
+      "anomaly_score": {
+        "type": "float"
+      },
+      "expected_cost_eur": {
+        "type": "float"
+      },
+      "failure_predicted": {
+        "type": "boolean"
+      },
+      "failure_probability": {
+        "type": "float"
+      },
+      "failure_type_probabilities": {
+        "properties": {
+          "HDF": { "type": "float" },
+          "OSF": { "type": "float" },
+          "PWF": { "type": "float" },
+          "RNF": { "type": "float" },
+          "TWF": { "type": "float" }
+        }
+      },
+      "failure_types": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "machine_id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "machine_type": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "timestamp": {
+        "type": "date"
+      }
+    }
+  }
+}
